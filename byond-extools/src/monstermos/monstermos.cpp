@@ -5,6 +5,7 @@
 #include "turf_grid.h"
 #include "../dmdism/opcodes.h"
 
+#include <unordered_set>
 #include <cmath>
 #include <chrono>
 
@@ -17,7 +18,7 @@ trvh fuck(unsigned int args_len, Value* args, Value src)
 
 std::unordered_map<std::string, Value> gas_types;
 std::unordered_map<unsigned int, int> gas_ids;
-//std::unordered_map<unsigned int, std::shared_ptr<GasMixture>> gas_mixtures;
+std::unordered_set<unsigned int> modified_datums;
 std::vector<Value> gas_id_to_type;
 TurfGrid all_turfs;
 Value SSair;
@@ -36,11 +37,14 @@ std::shared_ptr<GasMixture> &get_gas_mixture(Value val)
 int str_id_volume;
 trvh gasmixture_register(unsigned int args_len, Value* args, Value src)
 {
-	//gas_mixtures[src.value] = std::make_shared<GasMixture>(src.get_by_id(str_id_volume).valuef);
-	std::shared_ptr<GasMixture> *ptr = new std::shared_ptr<GasMixture>;
-	*ptr = std::make_shared<GasMixture>(src.get_by_id(str_id_volume).valuef);
+	GasMixture* gm = new GasMixture(src.get_by_id(str_id_volume).valuef);
+	std::shared_ptr<GasMixture> *ptr = new std::shared_ptr<GasMixture>(gm);
+	
+	modified_datums.insert(src.value);
+
 	SetVariable(src.type, src.value, str_id_extools_pointer, Value(NUMBER, (int)ptr));
 	gas_mixture_count++;
+
 	return Value::Null();
 }
 
@@ -57,22 +61,29 @@ trvh gasmixture_unregister(unsigned int args_len, Value* args, Value src)
 }
 
 DelDatumPtr oDelDatum;
-void hDelDatum(unsigned int datum_id) {
+void hDelDatum(unsigned int datum_id)
+{
+	using set_it = std::unordered_set<unsigned int>::iterator;
+	
 	RawDatum *datum = Core::GetDatumPointerById(datum_id);
-	if (datum != nullptr) {
-		std::shared_ptr<GasMixture> *gm = nullptr;
-		if (datum->len_vars < 10) { // if it has a whole bunch of vars it's probably not a gas mixture. Please don't add a whole bunch of vars to gas mixtures.
-			for (int i = 0; i < datum->len_vars; i++) {
-				if (datum->vars[i].id == str_id_extools_pointer) {
-					gm = (std::shared_ptr<GasMixture> *)datum->vars[i].value.value;
-					datum->vars[i].value = Value::Null();
-					break;
-				}
+
+	if (datum != nullptr)
+	{
+		const set_it it = modified_datums.find(datum_id);
+
+		if (it != modified_datums.end())
+		{
+			std::shared_ptr<GasMixture>* gm_ptr = 
+				reinterpret_cast<std::shared_ptr<GasMixture>*>
+					(Value(DataType::DATUM, datum_id).get_by_id(str_id_extools_pointer).value);
+
+			if (gm_ptr != nullptr)
+			{
+				delete gm_ptr;
+				gas_mixture_count--;
 			}
-		}
-		if (gm != nullptr) {
-			delete gm;
-			gas_mixture_count--;
+
+			modified_datums.erase(it);
 		}
 	}
 	oDelDatum(datum_id);
