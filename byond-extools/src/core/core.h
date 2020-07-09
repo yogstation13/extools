@@ -12,6 +12,7 @@
 #include <string>
 #include <cmath>
 #include <vector>
+#include <memory>
 
 #ifdef _WIN32
 #define EXPORT __declspec(dllexport)
@@ -96,10 +97,15 @@ namespace Core
 	extern unsigned int* name_table_id_ptr;
 	extern unsigned int* name_table;
 	extern Value* global_var_table;
-	extern TableHolder2* obj_table;
+	extern std::unique_ptr<RefTable<Obj>> obj_table;
 	extern TableHolder2* datum_table;
 	extern TableHolder2* list_table; //list list honk
-	extern TableHolder2* mob_table;
+	extern std::unique_ptr<RefTable<Mob>> mob_table;
+	extern TableHolder2* appearance_list_table;
+	extern AppearanceTable** appearance_table;
+	extern TurfTableHolder* turf_table;
+	extern TurfHashtableHolder* turf_hashtable;
+	extern TurfSharedInfo*** turf_shared_info_table;
 
 	extern RawDatum*** datum_pointer_table;
 	extern unsigned int* datum_pointer_table_length;

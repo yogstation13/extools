@@ -30,10 +30,15 @@ unsigned int* Core::name_table = nullptr;
 Value* Core::global_var_table = nullptr;
 std::unordered_map<std::string, Value*> Core::global_direct_cache;
 
-TableHolder2* Core::obj_table = nullptr;
+std::unique_ptr<RefTable<Obj>> Core::obj_table;
 TableHolder2* Core::datum_table = nullptr;
 TableHolder2* Core::list_table = nullptr;
-TableHolder2* Core::mob_table = nullptr;
+std::unique_ptr<RefTable<Mob>> Core::mob_table;
+TableHolder2* Core::appearance_list_table = nullptr;
+AppearanceTable** Core::appearance_table = nullptr;
+TurfTableHolder* Core::turf_table = nullptr;
+TurfHashtableHolder* Core::turf_hashtable = nullptr;
+TurfSharedInfo*** Core::turf_shared_info_table = nullptr;
 
 Core::ManagedString::ManagedString(unsigned int id) : string_id(id)
 {

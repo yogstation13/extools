@@ -98,6 +98,15 @@ typedef unsigned int(*GetRBTreeMemoryUsagePtr)(AssociativeListEntry* root);
 typedef trvh(*InitializeListFromContextPtr)(unsigned int list_id);
 typedef void(*DestroyListPtr)(unsigned int list_id);
 typedef void(*DestroyDatumPtr)(int unk1, int unk2, trvh datum);
+typedef void(*SetTurfAppearancePtr)(int appearance, int turf);
+typedef void(*SetAppearancePtr)(trvh atom, int appearance);
+typedef void(__fastcall *SpliceAppearancePtr)(void* this_, int edx, Appearance *appearance);
+typedef void(*SetPixelXPtr)(trvh atom, short pixel_x);
+typedef SetPixelXPtr SetPixelYPtr;
+typedef SetPixelXPtr SetPixelZPtr;
+typedef SetPixelXPtr SetPixelWPtr;
+typedef void(*SetMovableDirPtr)(trvh atom, unsigned char dir);
+typedef void(*SetLocPtr)(trvh atom, trvh loc);
 
 extern CrashProcPtr CrashProc;
 extern StartTimingPtr StartTiming;
@@ -147,6 +156,15 @@ extern InitializeListFromContextPtr InitializeListFromContext;
 extern RemoveFromContainerPtr RemoveFromContainer;
 extern DestroyListPtr DestroyList;
 extern DestroyDatumPtr DestroyDatum;
+extern SetTurfAppearancePtr SetTurfAppearance;
+extern SetAppearancePtr SetAppearance;
+extern SpliceAppearancePtr SpliceAppearance;
+extern SetPixelXPtr SetPixelX;
+extern SetPixelYPtr SetPixelY;
+extern SetPixelWPtr SetPixelW;
+extern SetPixelZPtr SetPixelZ;
+extern SetMovableDirPtr SetMovableDir;
+extern SetLocPtr SetLoc;
 
 
 inline void SetAssocElement(unsigned int listType, unsigned int listId, unsigned int keyType, unsigned int keyValue, unsigned int valueType, unsigned int valueValue) {

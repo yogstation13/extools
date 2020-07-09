@@ -164,6 +164,12 @@ enum class RbtColor : bool
 	Red = true,
 };
 
+enum class AppearanceRbtColor : bool
+{
+	Black = true,
+	Red = false,
+};
+
 struct AssociativeListEntry
 {
 	Value key;
@@ -442,6 +448,19 @@ struct TableHolder2
 	unsigned int length;
 };
 
+template<class T>
+struct RefTable
+{
+	RefTable(T*** e, unsigned int* l) : elements(*e), length(*l) {}
+	RefTable(TableHolder2* th) : elements(*(T***)&th->elements), length(th->length) {}
+	RefTable() : elements(dummy_elements), length(dummy_length) {}
+	T**& elements;
+	unsigned int& length;
+private:
+	T** dummy_elements = nullptr;
+	unsigned int dummy_length = 0;
+};
+
 struct VarListEntry;
 
 struct UnknownSimpleLinkedListEntry
@@ -469,16 +488,32 @@ struct TableHolder3
 struct Obj
 {
 	trvh loc;
-	char unknown[28];
+	char unknown[8];
+	short bound_x;
+	short bound_y;
+	short bound_width;
+	short bound_height;
+	float step_x;
+	float step_y;
+	float step_size;
 	UnknownComplexLinkedListEntry* some_other_linked_list;
 	VarListEntry* modified_vars;
 	std::uint16_t modified_vars_count;
 	std::uint16_t modified_vars_capacity;
-	char unknown2[12];
+	char unknown2[2];
+	short pixel_x;
+	short pixel_y;
+	short pixel_w;
+	short pixel_z;
+	char unknown3[2];
 	UnknownSimpleLinkedListEntry* some_linked_list;
 	TableHolder3* vis_contents;
 	TableHolder3* vis_locs;
-	char unknown3[84];
+	char unknown4[8];
+	int appearance;
+	int appearance2;
+	int appearance3;
+	char unknown5[64];
 };
 
 struct Datum
@@ -493,18 +528,84 @@ struct Datum
 
 struct Mob
 {
-	char unknown1[0x24];
+	trvh loc;
+	char unknown[0x8];
+	short bound_x;
+	short bound_y;
+	short bound_width;
+	short bound_height;
+	float step_x;
+	float step_y;
+	float step_size;
 	UnknownComplexLinkedListEntry* unknown_list1;
 	VarListEntry* modified_vars;
 	std::uint16_t modified_vars_count;
 	std::uint16_t modified_vars_capacity;
-	char unknown2[0xA];
+	char unknown2[0x2];
+	short pixel_x;
+	short pixel_y;
+	short pixel_w;
+	short pixel_z;
+	char unknown3[0x2];
 	UnknownSimpleLinkedListEntry* unknown_list2;
 	TableHolder3* some_holder1;
 	TableHolder3* some_holder2;
-	char unknown3[0x60];
+	char unknown4[0x8];
+	int appearance;
+	int appearance2;
+	int appearance3;
+	char unknown5[0x4C];
 	UnknownSimpleLinkedListEntry* unknown_list3;
-	char unknown4[0x10];
+	char unknown6[0x10];
+};
+
+struct Turf { // According to lummox, this struct also includes info about atoms overhanging and animations too
+	int id;
+	Turf* next;
+	int obj_contents;
+	int mob_contents;
+	int unk_10;
+	TableHolder3* vis_contents; // vis_contents
+	TableHolder3* vis_locs;
+	int unk_1c;
+	int unk_20;
+	int unk_24;
+	int unk_28;
+	int unk_2c;
+};
+struct TurfVars {
+	int id;
+	TurfVars* next;
+	VarListEntry* modified_vars;
+	std::uint16_t modified_vars_count;
+	std::uint16_t modified_vars_capacity;
+};
+
+struct TurfSharedInfo {
+	int typepath_id;
+	int appearance;
+	int area;
+	int unk_0c;
+	short unk_10;
+	short unk_12;
+	int unk_14;
+	short unk_18;
+	short unk_1a;
+	int unk_1c;
+};
+
+struct TurfTableHolder {
+	int* shared_info_id_table;
+	unsigned char* existence_table;
+	int turf_count;
+	int maxx;
+	int maxy;
+	int maxz;
+};
+struct TurfHashtableHolder {
+	Turf** elements;
+	int size;
+	int mask;
 };
 
 struct VarListEntry
@@ -512,4 +613,117 @@ struct VarListEntry
 	std::uint32_t unknown;
 	std::uint32_t name_id;
 	trvh value;
+};
+
+struct Appearance
+{
+	Appearance* left_node;
+	Appearance* right_node;
+	Appearance* parent_node;
+	Appearance* prev_node;
+	Appearance* next_node;
+	int id;
+	AppearanceRbtColor node_color;
+	int name_str;
+	int desc_str;
+	int suffix_str;
+	int screen_loc_str;
+	int text_str;
+	int icon_res;
+	int icon_state_str;
+	int overlays_list;
+	int underlays_list;
+	int verbs_list;
+	int unk_44;
+
+	unsigned int opacity : 1;
+	unsigned int density : 1;
+	unsigned int unk_48_4 : 4;
+	unsigned int gender : 2;
+
+	unsigned int mouse_drop_zone : 1;
+	unsigned int dir_override : 1; // internal flag for whether dir is inherited or not
+	unsigned int unk_49_4 : 2;
+	unsigned int mouse_opacity : 2;
+	unsigned int animate_movement : 2; // add one and bitwise-and 3 to get actual value
+	
+	unsigned int unk_4a : 2;
+	unsigned int override : 1;
+	unsigned int unk_4a_8 : 3;
+	
+	unsigned int appearance_flags : 10;
+	
+	unsigned char dir;
+	unsigned char invisibility;
+	unsigned char infra_luminosity;
+	unsigned char luminosity;
+	
+	short pixel_x;
+	short pixel_y;
+	
+	short pixel_w;
+	short pixel_z;
+	
+	float glide_size;
+	float layer;
+	int maptext_str;
+	
+	short maptext_x;
+	short maptext_y;
+	
+	short maptext_width;
+	short maptext_height;
+	
+	Value mouse_over_pointer;
+	Value mouse_drag_pointer;
+	Value mouse_drop_pointer;
+	int unk_84; // an appearance
+	int unk_88; // an appearance
+	int unk_8c; // an appearance
+	
+	float transform[6];
+	
+	union {
+		struct {
+			unsigned char color_r;
+			unsigned char color_g;
+			unsigned char color_b;
+			unsigned char alpha;
+		};
+		unsigned int color_alpha;
+	};
+	
+	
+	short blend_mode;
+	short plane;
+	
+	float *color_matrix;
+	int unk_b4; // probably filters imo
+	int render_source_str;
+	int render_target_str;
+	
+	unsigned short vis_flags;
+	short unk_c2;
+	
+	int unk_c4;
+	int unk_c8;
+	int unk_cc;
+	int unk_d0;
+	int unk_d4;
+	int unk_d8;
+	int unk_dc;
+	int refcount;
+};
+
+struct AppearanceTable
+{
+	char unk[0x40];
+	Appearance** elements;
+	int length;
+};
+
+struct AppearanceList // used for overlays, underlays, etc
+{
+	short len;
+	int* ids;
 };
