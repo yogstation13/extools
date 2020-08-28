@@ -8,7 +8,5 @@ extern "C" EXPORT const char* init_monstermos(int n_args, const char** args)
 		return "Extools Init Failed";
 	}
 
-	total_num_gases = (int)n_args;
-
 	return enable_monstermos();
 }
