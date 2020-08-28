@@ -210,7 +210,6 @@ int GasMixture::compare(GasMixture &sample) const {
 void GasMixture::clear() {
 	if (immutable) return;
 	moles.clear();
-	moles.shrink_to_fit();
 
 	for (int gas_type : gas_specific_heat)
 		moles.push_back(0.0f); //shitty way to repopulate the moles but it works for now
