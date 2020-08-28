@@ -23,8 +23,8 @@ TurfGrid all_turfs;
 Value SSair;
 int str_id_extools_pointer;
 int gas_mixture_count = 0;
-float gas_moles_visible[TOTAL_NUM_GASES];
-std::vector<Value> gas_overlays[TOTAL_NUM_GASES];
+std::vector<float> gas_moles_visible;
+std::vector<std::vector<Value>> gas_overlays;
 
 std::shared_ptr<GasMixture> &get_gas_mixture(Value val)
 {
@@ -169,7 +169,7 @@ trvh gasmixture_get_gases(unsigned int args_len, Value* args, Value src)
 {
 	List l(CreateList(0));
 	GasMixture &gm = *get_gas_mixture(src);
-	for (int i = 0; i < TOTAL_NUM_GASES; i++) {
+	for (int i = 0; i < total_num_gases; i++) {
 		if (gm.get_moles(i) >= GAS_MIN_MOLES) {
 			l.append(gas_id_to_type[i]);
 		}
@@ -359,7 +359,15 @@ trvh turf_update_visuals(unsigned int args_len, Value* args, Value src) {
 	Value old_overlay_types_val = src.get_by_id(str_id_atmos_overlay_types);
 	std::vector<Value> overlay_types;
 
-	for (int i = 0; i < TOTAL_NUM_GASES; i++) {
+	if (!gas_overlays.size())
+		for (int gas_type : gas_specific_heat)
+			gas_overlays.push_back({}); //this is janky I'm sorry I don't have the time to do a more elegant solution
+
+	if (!gas_moles_visible.size())
+		for (int gas_type : gas_specific_heat)
+			gas_moles_visible.push_back({});
+
+	for (int i = 0; i < total_num_gases; i++) {
 		if (!gas_overlays[i].size()) continue;
 		if (gm.get_moles(i) > gas_moles_visible[i]) {
 			// you know whats fun?
@@ -433,7 +441,7 @@ void initialize_gas_overlays() {
 	if (!GLOB) return;
 	Container meta_gas_info = GLOB.get("meta_gas_info");
 	if (!meta_gas_info.type) return;
-	for (int i = 0; i < TOTAL_NUM_GASES; ++i)
+	for (int i = 0; i < total_num_gases; ++i)
 	{
 		Value v = gas_id_to_type[i];
 		Container gas_meta = meta_gas_info.at(v);
@@ -492,15 +500,19 @@ const char* enable_monstermos()
 	Container gas_types_list = Core::get_proc("/proc/gas_types").call(nullvector);
 	Container meta_gas_info = Value::Global().get("meta_gas_info");
 	int gaslen = gas_types_list.length();
-	if (gaslen != TOTAL_NUM_GASES) {
-		return "TOTAL_NUM_GASES does not match the number of /datum/gas subtypes!!";
+	/*
+	if (gaslen != total_num_gases) {
+		return "TOTAL_NUM_GASES does not match the number of /datum/gas subtypes!!";  // this is dumb, why would you gather the gas types count them and then check for a hardcoded variable to see if they match.
 	}
+	*/
+
+	total_num_gases = gaslen; // -1 because byond arrays start with 1 for what ever reason 
 	for (int i = 0; i < gaslen; ++i)
 	{
 		Value v = gas_types_list.at(i);
 		gas_types[Core::stringify(v)] = gas_types_list.at(i);
 		gas_ids[v.value] = i;
-		gas_specific_heat[i] = gas_types_list.at(v).valuef;
+		gas_specific_heat.push_back(gas_types_list.at(v).valuef);
 		gas_id_to_type.push_back(v);
 	}
 	initialize_gas_overlays();
