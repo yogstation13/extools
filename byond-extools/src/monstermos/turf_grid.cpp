@@ -122,13 +122,13 @@ void Tile::process_cell(int fire_count) {
 
 		if (should_share_air) {
 			// if youre like not yogs and youre porting this shit and you hate monstermos and you want spacewind just uncomment this shizz
-			float difference = air->share(*enemy_tile.air, adjacent_turfs_length);
-			if (difference > 0) {
+			/*float difference = */air->share(*enemy_tile.air, adjacent_turfs_length);
+			/*if (difference > 0) {
 				turf_ref.invoke_by_id(str_id_consider_pressure_difference, { enemy_tile.turf_ref, difference });
 			}
 			else {
 				enemy_tile.turf_ref.invoke_by_id(str_id_consider_pressure_difference, { turf_ref, -difference });
-			}
+			}*/
 			last_share_check();
 		}
 	}
@@ -201,6 +201,8 @@ bool cmp_monstermos_pushorder(Tile* a, Tile* b) {
 }
 
 uint64_t eq_queue_cycle_ctr = 0;
+const int MONSTERMOS_TURF_LIMIT = 200;
+const int MONSTERMOS_HARD_TURF_LIMIT = 2000;
 const int opp_dir_index[] = {1, 0, 3, 2, 5, 4, 6};
 
 void Tile::adjust_eq_movement(int dir_index, float amount) {
@@ -273,9 +275,6 @@ void Tile::equalize_pressure_in_zone(int cyclenum) {
 	// and that's just the way the math works out in SS13. And there's no reactions going on - hyper-noblium stops all reactions from happening.
 	// I'm pretty sure real gases don't work this way. Oh yeah this property can be used to make bombs too I guess so thats neat
 
-	const int MONSTERMOS_TURF_LIMIT = SSair.get_by_id(str_id_monstermos_turf_limit);
-	const int MONSTERMOS_HARD_TURF_LIMIT = SSair.get_by_id(str_id_monstermos_hard_turf_limit);
-
 	if (!air || (monstermos_info && monstermos_info->last_cycle >= cyclenum)) return; // if we're already done it then piss off.
 
 	if (monstermos_info)
@@ -339,17 +338,15 @@ void Tile::equalize_pressure_in_zone(int cyclenum) {
 				adj->monstermos_info = std::make_unique<MonstermosInfo>();
 			}
 			adj->monstermos_info->last_queue_cycle = queue_cycle;
-			if (!adj->air->is_immutable()) {
-				turfs.push_back(adj);
-			}
-/*			else {
+			turfs.push_back(adj);
+			if (adj->air->is_immutable()) {
 				// Uh oh! looks like someone opened an airlock to space! TIME TO SUCK ALL THE AIR OUT!!!
 				// NOT ONE OF YOU IS GONNA SURVIVE THIS
 				// (I just made explosions less laggy, you're welcome)
-				//turfs.push_back(adj);
-				//explosively_depressurize(cyclenum);
-				//return;
-			}*/
+				turfs.push_back(adj);
+				explosively_depressurize(cyclenum);
+				return;
+			}
 		}
 	}
 	if (turfs.size() > MONSTERMOS_TURF_LIMIT) {
@@ -591,8 +588,6 @@ void Tile::equalize_pressure_in_zone(int cyclenum) {
 
 void Tile::explosively_depressurize(int cyclenum) {
 	if (!air) return; // air is very important I think
-	const int MONSTERMOS_TURF_LIMIT = SSair.get_by_id(str_id_monstermos_turf_limit);
-	const int MONSTERMOS_HARD_TURF_LIMIT = SSair.get_by_id(str_id_monstermos_hard_turf_limit);
 	float total_gases_deleted = 0;
 	uint64_t queue_cycle = ++eq_queue_cycle_ctr;
 	std::vector<Tile*> turfs;
