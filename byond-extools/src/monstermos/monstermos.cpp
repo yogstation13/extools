@@ -617,18 +617,20 @@ trvh refresh_atmos_grid(unsigned int args_len, Value* args, Value src)
 void initialize_gas_overlays() {
 	Value GLOB = Value::Global().get("GLOB");
 	if (!GLOB) return;
-	Container meta_gas_visibility = GLOB.get("meta_gas_visibility");
-	Container meta_gas_overlays = GLOB.get("meta_gas_overlays");
-	if (!meta_gas_visibility.type) return;
+	Container meta_gas_info = GLOB.get("meta_gas_info");
+	if (!meta_gas_info.type) return;
 	for (int i = 0; i < total_num_gases; ++i)
 	{
 		Value v = gas_id_to_type[i];
-		gas_moles_visible[i] = meta_gas_visibility.at(v);
+		Container gas_meta = meta_gas_info.at(v);
+		gas_moles_visible[i] = gas_meta.at(2);
 		gas_overlays[i].clear();
-		Container gas_overlays_list = meta_gas_overlays.at(v);
-		int num_overlays = gas_overlays_list.length();
-		for (int j = 0; j < num_overlays; j++) {
-			gas_overlays[i].push_back(gas_overlays_list[j]);
+		if(gas_meta.at(3)) {
+			Container gas_overlays_list = gas_meta.at(3);
+			int num_overlays = gas_overlays_list.length();
+			for (int j = 0; j < num_overlays; j++) {
+				gas_overlays[i].push_back(gas_overlays_list[j]);
+			}
 		}
 	}
 }
