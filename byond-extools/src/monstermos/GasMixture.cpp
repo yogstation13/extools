@@ -8,8 +8,6 @@
 
 #include <numeric>
 
-#include <execution>
-
 using namespace monstermos::constants;
 
 std::vector<float> gas_specific_heat;
@@ -27,7 +25,7 @@ GasMixture::GasMixture(float v)
 GasMixture::GasMixture() {}
 
 float GasMixture::total_moles() const {
-    return std::reduce(std::execution::seq,moles.cbegin(),moles.cend());
+    return std::reduce(moles.cbegin(),moles.cend());
 }
 
 void GasMixture::mark_immutable() {
@@ -37,7 +35,6 @@ void GasMixture::mark_immutable() {
 float GasMixture::heat_capacity() const {
     return std::max(
         (float)std::transform_reduce(
-            std::execution::seq,
             moles.cbegin(),moles.cend(),
             gas_specific_heat.cbegin(),
             0.0),
@@ -47,7 +44,6 @@ float GasMixture::heat_capacity() const {
 float GasMixture::heat_capacity_archived() const {
     return std::max(
         (float)std::transform_reduce(
-            std::execution::seq,
             moles_archived.cbegin(),moles_archived.cend(),
             gas_specific_heat.cbegin(),
             0.0), 
@@ -84,7 +80,6 @@ void GasMixture::merge(const GasMixture &giver) {
         }
     }
     std::transform(
-        std::execution::seq,
         moles.begin(),moles.end(),
         giver.moles.cbegin(),
         moles.begin(),
@@ -103,7 +98,7 @@ GasMixture GasMixture::remove_ratio(float ratio) {
 
     auto removed = GasMixture(volume);
     removed.temperature = temperature;
-    std::transform(std::execution::seq,
+    std::transform(
         moles.begin(),moles.end(),
         removed.moles.begin(),
         [&ratio](auto& gas) {
@@ -115,7 +110,7 @@ GasMixture GasMixture::remove_ratio(float ratio) {
     });
     if(!immutable)
     {
-        std::transform(std::execution::seq,
+        std::transform(
         moles.begin(),moles.end(),
         removed.moles.begin(),
         moles.begin(),
@@ -253,7 +248,7 @@ void GasMixture::clear() {
 
 void GasMixture::multiply(float multiplier) {
 	if (immutable) return;
-    std::transform(std::execution::seq,
+    std::transform(
         moles.begin(),moles.end(),
         moles.begin(),
         [&multiplier](auto& gas) {

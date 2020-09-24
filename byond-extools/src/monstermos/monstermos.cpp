@@ -11,8 +11,6 @@
 
 #include <algorithm>
 
-#include <execution>
-
 using namespace monstermos::constants;
 
 trvh fuck(unsigned int args_len, Value* args, Value src)
@@ -674,7 +672,7 @@ trvh gasmixture_react(unsigned int args_len, Value* args, Value src)
 		holder = args[0];
 	}
 	std::vector<bool> can_react(cached_reactions.size());
-	std::transform(std::execution::seq, //par introduces 2000 ns overhead, so, if this ever gets to be more than 2000 ns...
+	std::transform(
 		cached_reactions.begin(),cached_reactions.end(),
 		can_react.begin(),
 		[&src_gas](auto& reaction) {
