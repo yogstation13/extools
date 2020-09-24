@@ -21,7 +21,7 @@ jobs:
       run: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo dpkg --add-architecture i386
-        sudo apt update && sudo apt install gcc-multilib g++-multilib gcc-10 g++-10 -y
+        sudo apt update && sudo apt install gcc-10-multilib g++-10-multilib gcc-10 g++-10 -y
         mkdir build
         cd build
         cmake ../byond-extools 
