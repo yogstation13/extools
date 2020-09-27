@@ -514,9 +514,12 @@ void add_to_active(Tile* tile)
 
 void remove_from_active(Tile* tile)
 {
-	if(active_turfs.empty()) return;
-	if(*active_turfs_currentrun_pos == tile) active_turfs_currentrun_pos++; // this iterator's gonna be invalidated--go to the next one
-	active_turfs.erase(tile);
+	auto found = active_turfs.equal_range(tile);
+	if(found.first != active_turfs.end())
+	{
+		auto active_erase = active_turfs.erase(found.first);
+		if(found.first == active_turfs_currentrun_pos) active_turfs_currentrun_pos = active_erase;
+	}
 }
 
 trvh SSair_clear_active_turfs(unsigned int args_len, Value* args, Value src)
