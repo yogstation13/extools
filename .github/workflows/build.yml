@@ -22,11 +22,11 @@ jobs:
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo dpkg --add-architecture i386
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-        sudo apt-get install g++-10-multilib
+        sudo apt-get install g++-10-multilib llvm-10-dev
         mkdir build
         cd build
         cmake ../byond-extools 
-        cmake --build .
+        cmake --build -DCMAKE_BUILD_TYPE=RelWithDebInfo .
       env:
         CC:   clang
         CXX:  clang++
@@ -35,6 +35,7 @@ jobs:
       run: |
         mkdir artifacts
         cp build/libbyond-extools.so artifacts
+        cp build/
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v1
