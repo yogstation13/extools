@@ -22,6 +22,7 @@ jobs:
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo dpkg --add-architecture i386
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+        sudo apt-get install libc6 libc6-dev
         mkdir build
         cd build
         cmake ../byond-extools 
