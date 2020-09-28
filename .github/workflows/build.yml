@@ -21,7 +21,7 @@ jobs:
       run: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo dpkg --add-architecture i386
-        bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+        sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
         mkdir build
         cd build
         cmake ../byond-extools 
