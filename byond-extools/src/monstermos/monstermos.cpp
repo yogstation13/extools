@@ -11,6 +11,10 @@
 
 #include <algorithm>
 
+#include <execution>
+
+#include <unordered_set>
+
 using namespace monstermos::constants;
 
 trvh fuck(unsigned int args_len, Value* args, Value src)
@@ -32,6 +36,29 @@ int str_id_times_fired;
 int total_num_gases = 0;
 std::vector<float> gas_moles_visible;
 std::vector < std::vector<Value> > gas_overlays;
+
+std::vector<Tile*> active_turfs;
+
+std::vector<Tile*> active_turfs_currentrun;
+
+void add_to_active(Tile* tile)
+{
+	auto pos = std::lower_bound(active_turfs.begin(),active_turfs.end(),tile);
+	active_turfs.insert(pos,tile);
+}
+
+void remove_from_active(Tile* tile)
+{
+	auto iters = std::equal_range(active_turfs.begin(),active_turfs.end(),tile);
+	if(iters.first != active_turfs.end())
+	{
+		active_turfs.erase(iters.first,iters.second);
+	}
+}
+void clear_active_turfs()
+{
+	active_turfs.clear();
+}
 
 size_t get_gas_mixture_index(Value val)
 {
@@ -60,6 +87,7 @@ trvh gasmixture_register(unsigned int args_len, Value* args, Value src)
 		if(gas_mixtures.capacity() > original_capacity)
 		{
 			all_turfs.refresh();
+			clear_active_turfs();
 		}
 	}
 	else
@@ -496,36 +524,9 @@ trvh SSair_get_amt_excited_groups(unsigned int args_len, Value* args, Value src)
 	return Value(excited_groups.size());
 }
 
-#include <unordered_set>
-
-std::unordered_set<Tile*> active_turfs;
-
-std::unordered_set<Tile*>::iterator active_turfs_currentrun_pos = active_turfs.begin();
-
-void add_to_active(Tile* tile)
-{
-	auto prev_bucket_count = active_turfs.bucket_count();
-	active_turfs.insert(tile);
-	if(active_turfs.bucket_count() > prev_bucket_count || active_turfs.size() == 1) //the iterators are invalidated--start over
-	{
-		active_turfs_currentrun_pos = active_turfs.begin();
-	}
-}
-
-void remove_from_active(Tile* tile)
-{
-	auto found = active_turfs.equal_range(tile);
-	if(found.first != active_turfs.end())
-	{
-		auto active_erase = active_turfs.erase(found.first);
-		if(found.first == active_turfs_currentrun_pos) active_turfs_currentrun_pos = active_erase;
-	}
-}
-
 trvh SSair_clear_active_turfs(unsigned int args_len, Value* args, Value src)
 {
-	active_turfs.clear();
-	active_turfs_currentrun_pos = active_turfs.begin();
+	clear_active_turfs();
 	return Value::Null();
 }
 
@@ -575,13 +576,13 @@ trvh SSair_process_active_turfs(unsigned args_len,Value* args,Value src)
 
 	int fire_count = SSair.get_by_id(str_id_times_fired);
 	if (!args[0]) {
-		active_turfs_currentrun_pos = active_turfs.begin();
+		active_turfs_currentrun = active_turfs;
 	}
-	while(active_turfs_currentrun_pos != active_turfs.end())
+	while(!active_turfs_currentrun.empty())
 	{
-		auto tile = *active_turfs_currentrun_pos;
+		auto tile = active_turfs_currentrun.back();
+		active_turfs_currentrun.pop_back();
 		tile->process_cell(fire_count);
-		active_turfs_currentrun_pos++;
 		if (checker.peek() > time_limit) {
 			return Value::True();
 		}
@@ -597,13 +598,13 @@ trvh SSair_process_equalize_turfs(unsigned args_len,Value* args,Value src)
 
 	int fire_count = SSair.get_by_id(str_id_times_fired);
 	if (!args[0]) {
-		active_turfs_currentrun_pos = active_turfs.begin();
+		active_turfs_currentrun = active_turfs;
 	}
-	while(active_turfs_currentrun_pos != active_turfs.end())
+	while(!active_turfs_currentrun.empty())
 	{
-		auto tile = *active_turfs_currentrun_pos;
+		auto tile = active_turfs_currentrun.back();
+		active_turfs_currentrun.pop_back();
 		tile->equalize_pressure_in_zone(fire_count);
-		active_turfs_currentrun_pos++;
 		if (checker.peek() > time_limit) {
 			return Value::True();
 		}
@@ -657,12 +658,6 @@ trvh SSair_update_ssair(unsigned int args_len, Value* args, Value src) {
 	return Value::Null();
 }
 
-long long react_check_benchmark = 0;
-
-long long react_total_benchmark = 0;
-
-long reacts_done = 0;
-
 trvh gasmixture_react(unsigned int args_len, Value* args, Value src)
 {
 	GasMixture &src_gas = get_gas_mixture(src);
@@ -677,7 +672,7 @@ trvh gasmixture_react(unsigned int args_len, Value* args, Value src)
 		holder = args[0];
 	}
 	std::vector<bool> can_react(cached_reactions.size());
-	std::transform(
+	std::transform(std::execution::seq, //par introduces 2000 ns overhead, so, if this ever gets to be more than 2000 ns...
 		cached_reactions.begin(),cached_reactions.end(),
 		can_react.begin(),
 		[&src_gas](auto& reaction) {
@@ -705,6 +700,47 @@ trvh get_extools_benchmarks(unsigned int args_len, Value* args, Value src)
 	return l;
 }
 
+trvh SSair_check_all_turfs(unsigned int args_len,Value* args,Value src)
+{
+	if (args_len < 1 || args[0]) { return Value::True(); }
+	std::atomic_size_t cur_idx = 0;
+	std::for_each(std::execution::par_unseq,
+		all_turfs.begin(),
+		all_turfs.end(),
+		[&cur_idx](Tile& tile) {
+			if(tile.excited)
+			{
+				active_turfs[cur_idx++] = &tile;
+				return;
+			}
+			for(int i = 0;i<6;i++)
+			{
+				if (tile.adjacent_bits & (1 << i) && tile.adjacent[i]->air != nullptr && tile.air->compare(*(tile.adjacent[i]->air)) != -2)
+				{
+					active_turfs[cur_idx++] = &tile;
+					tile.excited = true;
+					return;
+				}
+			}
+			tile.excited = false;
+		}
+	);
+	active_turfs.resize(cur_idx+1);
+	if(active_turfs.size() > 2048)
+	{
+		std::sort(std::execution::par_unseq,active_turfs.begin(),active_turfs.end());
+	}
+	else
+	{
+		std::sort(std::execution::seq,active_turfs.begin(),active_turfs.end());
+	}
+	if(active_turfs[0] == nullptr)
+	{
+		active_turfs.erase(active_turfs.begin(),std::upper_bound(active_turfs.begin(),active_turfs.end(),nullptr));
+	}
+	return Value::False();
+}
+
 int str_id_air;
 int str_id_atmosadj;
 int str_id_is_openturf, str_id_archive;
@@ -716,10 +752,19 @@ int str_id_monstermos_turf_limit, str_id_monstermos_hard_turf_limit;
 const char* enable_monstermos()
 {
 	oDelDatum = (DelDatumPtr)Core::install_hook((void*)DelDatum, (void*)hDelDatum);
+	active_turfs.clear();
 	gas_mixtures.clear();
 	next_gas_ids.clear();
 	// if we don't do this, it'll reallocate too often. please do this.
+	/*  you might wonder: "won't this take up a lot of memory?"
+		sizeof(GasMixture) as of right now is (highballing) 32 bytes,
+		so this is 6.4 megabytes.
+		"but what about the gases? 4 bytes per gas?", you ask? well,
+		I moved gases to a vector in GasMixture, which isn't actually
+		filled out until the mixture is properly registered.
+	*/
 	gas_mixtures.reserve(200000);
+	active_turfs.reserve(20000); //80 kb
 	// get the var IDs for SANIC SPEED
 	str_id_air = Core::GetStringId("air", true);
 	str_id_atmosadj = Core::GetStringId("atmos_adjacent_turfs", true);
@@ -811,6 +856,7 @@ const char* enable_monstermos()
 	Core::get_proc("/datum/controller/subsystem/air/proc/get_max_gas_mixes").hook(SSair_get_max_gas_mixes);
 	Core::get_proc("/datum/controller/subsystem/air/proc/extools_update_ssair").hook(SSair_update_ssair);
 	Core::get_proc("/datum/controller/subsystem/air/proc/extools_update_reactions").hook(SSair_update_gas_reactions);
+	Core::get_proc("/datum/controller/subsystem/air/proc/rescan_active_turfs").hook(SSair_check_all_turfs);
 	Core::get_proc("/proc/get_extools_benchmarks").hook(get_extools_benchmarks);
 	all_turfs.refresh();
 	return "ok";

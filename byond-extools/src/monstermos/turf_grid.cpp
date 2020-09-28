@@ -698,16 +698,17 @@ void Tile::explosively_depressurize(int cyclenum) {
 	return;
 }
 
-Tile *TurfGrid::get(int x, int y, int z) const {
+Tile *TurfGrid::get(int x, int y, int z) {
 	if (x < 1 || y < 1 || z < 1 || x > maxx || y > maxy || z > maxz) return nullptr;
-	if (!tiles) return nullptr;
-	return &tiles[(x - 1) + maxx * (y - 1 + maxy * (z - 1))];
+	if (tiles.empty()) return nullptr;
+	return get((x - 1) + maxx * (y - 1 + maxy * (z - 1)));
 }
-Tile *TurfGrid::get(int id) const {
-	if (!tiles || id < 0 || id >= maxid) {
+Tile *TurfGrid::get(int id) {
+	if (tiles.empty() || id < 0 || id >= maxid) {
 		return nullptr;
 	}
-	return &tiles[id];
+	Tile* data = tiles.data();
+	return &(tiles.data()[id]);
 }
 void TurfGrid::refresh() {
 	int new_maxx = Value::World().get("maxx").valuef;
@@ -715,7 +716,7 @@ void TurfGrid::refresh() {
 	int new_maxz = Value::World().get("maxz").valuef;
 	// we make a new thingy
 	// delete the old one too I guess
-	std::unique_ptr<Tile[]> new_tiles(new Tile[new_maxx*new_maxy*new_maxz]);
+	std::vector<Tile> new_tiles(new_maxx*new_maxy*new_maxz);
 
 	// make the thingy have actual like values or some shit I guess
 	for (int z = 1; z <= new_maxz; z++) {
