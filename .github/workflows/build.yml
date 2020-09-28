@@ -24,9 +24,13 @@ jobs:
         sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
         sudo apt-get install g++-10-multilib llvm-10-dev
         mkdir build
+        mkdir yogs
         cd build
-        cmake ../byond-extools 
-        cmake --build -DCMAKE_BUILD_TYPE=RelWithDebInfo .
+        cmake ../byond-extools -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        cmake --build .
+        cd ../yogs
+        cmake ../byond-extools -DCMAKE_BUILD_TYPE=Yogs
+        cmake --build .
       env:
         CC:   clang
         CXX:  clang++
@@ -34,15 +38,22 @@ jobs:
     - name: Prepare Artifacts
       run: |
         mkdir artifacts
+        mkdir yogs-artifacts
         cp build/libbyond-extools.so artifacts
-        cp build/
+        cp yogs/libbyond-extools.so yogs-artifacts
 
-    - name: Upload Artifacts
+    - name: Upload General Artifacts
       uses: actions/upload-artifact@v1
       with: 
         name: Linux
         path: ${{github.workspace}}/artifacts
-        
+
+    - name: Upload Yogs Artifacts
+      uses: actions/upload-artifact@v1
+      with: 
+        name: Yogs
+        path: ${{github.workspace}}/yogs-artifacts
+
   windows:
      runs-on: windows-2019
      steps:

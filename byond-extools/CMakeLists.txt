@@ -13,6 +13,29 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_CXX_FLAGS_YOGS "-Ofast -gline-tables-only -fstandalone-debug -march=skylake -flto" CACHE STRING
+    "C++ flags for Yogs use."
+    FORCE
+)
+set(CMAKE_C_FLAGS_YOGS "-Ofast -gline-tables-only -fstandalone-debug -march=skylake -flto" CACHE STRING
+    "C flags for Yogs use."
+    FORCE
+)
+set(CMAKE_EXE_LINKER_FLAGS_YOGS
+  "" CACHE STRING
+  "Linker flags for yogs use."
+  FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS_YOGS
+  "" CACHE STRING
+  "Shared libraries linker flags for yogs use (we don't use this.)"
+  FORCE)
+
+mark_as_advanced(
+  CMAKE_CXX_FLAGS_YOGS
+  CMAKE_C_FLAGS_YOGS
+  CMAKE_EXE_LINKER_FLAGS_YOGS
+  CMAKE_SHARED_LINKER_FLAGS_YOGS)
+
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 if (WIN32)
     file(GLOB_RECURSE SRC_FILES
@@ -48,7 +71,7 @@ else()
     set_target_properties(byond-extools PROPERTIES COMPILE_OPTIONS "-m32" LINK_FLAGS "-m32")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-        target_compile_options(byond-extools PRIVATE "$<$<CONFIG:RELWITHDEBINFO>:-Ofast;-march=skylake>")
-        target_compile_options(byond-extools PRIVATE "$<$<CONFIG:RELEASE>:-Ofast;-march=skylake>")
+        target_compile_options(byond-extools PRIVATE "$<$<CONFIG:RELWITHDEBINFO>:-Ofast>")
+        target_compile_options(byond-extools PRIVATE "$<$<CONFIG:RELEASE>:-Ofast>")
     endif()
 endif()
