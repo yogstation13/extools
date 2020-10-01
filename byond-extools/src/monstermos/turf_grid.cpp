@@ -716,16 +716,15 @@ void TurfGrid::refresh() {
 	int new_maxz = Value::World().get("maxz").valuef;
 	// we make a new thingy
 	// delete the old one too I guess
-	std::vector<Tile> new_tiles(new_maxx*new_maxy*new_maxz);
+	tiles.resize(new_maxx*new_maxy*new_maxz);
 
 	// make the thingy have actual like values or some shit I guess
 	for (int z = 1; z <= new_maxz; z++) {
 		for (int y = 1; y <= new_maxy; y++) {
 			for (int x = 1; x <= new_maxx; x++) {
 				int index = (x - 1) + new_maxx * (y - 1 + new_maxy * (z - 1));
-				Tile &tile = new_tiles[index];
+				Tile &tile = tiles[index];
 				if (x <= maxx && y <= maxy && z <= maxz) {
-					tile = std::move(*get(x,y,z));
 					tile.excited_group.reset(); // excited group contains hanging pointers now (well they're not hanging yet, but they *will* be!)
 					tile.monstermos_info.reset(); // this also has hanging pointers.
 				}
@@ -735,14 +734,14 @@ void TurfGrid::refresh() {
 		}
 	}
 
-	tiles = std::move(new_tiles);
 	maxx = new_maxx; 
 	maxy = new_maxy;
 	maxz = new_maxz;
 
 	maxid = maxx * maxy * maxz;
-	for (int i = 0; i < maxid; i++) {
-		tiles[i].update_adjacent(*this);
+	for(Tile& t : tiles)
+	{
+		t.update_adjacent(*this);
 	}
 }
 

@@ -39,8 +39,6 @@ std::vector < std::vector<Value> > gas_overlays;
 
 std::vector<Tile*> active_turfs;
 
-std::vector<Tile*> active_turfs_currentrun;
-
 void add_to_active(Tile* tile)
 {
 	auto pos = std::lower_bound(active_turfs.begin(),active_turfs.end(),tile);
@@ -575,19 +573,11 @@ trvh SSair_process_active_turfs(unsigned args_len,Value* args,Value src)
 	float time_limit = args[1] * 100000.0f;
 
 	int fire_count = SSair.get_by_id(str_id_times_fired);
-	if (!args[0]) {
-		active_turfs_currentrun = active_turfs;
-	}
-	while(!active_turfs_currentrun.empty())
+	for(Tile* tile : active_turfs)
 	{
-		auto tile = active_turfs_currentrun.back();
-		active_turfs_currentrun.pop_back();
 		tile->process_cell(fire_count);
-		if (checker.peek() > time_limit) {
-			return Value::True();
-		}
 	}
-	return Value::False();
+	return Value(checker.peek() > time_limit);
 }
 
 trvh SSair_process_equalize_turfs(unsigned args_len,Value* args,Value src)
@@ -597,19 +587,11 @@ trvh SSair_process_equalize_turfs(unsigned args_len,Value* args,Value src)
 	float time_limit = args[1] * 100000.0f;
 
 	int fire_count = SSair.get_by_id(str_id_times_fired);
-	if (!args[0]) {
-		active_turfs_currentrun = active_turfs;
-	}
-	while(!active_turfs_currentrun.empty())
+	for(Tile* tile : active_turfs)
 	{
-		auto tile = active_turfs_currentrun.back();
-		active_turfs_currentrun.pop_back();
 		tile->equalize_pressure_in_zone(fire_count);
-		if (checker.peek() > time_limit) {
-			return Value::True();
-		}
 	}
-	return Value::False();
+	return Value(checker.peek() > time_limit);
 }
 
 trvh refresh_atmos_grid(unsigned int args_len, Value* args, Value src)
@@ -713,6 +695,7 @@ trvh SSair_check_all_turfs(unsigned int args_len,Value* args,Value src)
 				active_turfs[cur_idx++] = &tile;
 				return;
 			}
+			if(tile.air == nullptr) return;
 			for(int i = 0;i<6;i++)
 			{
 				if (tile.adjacent_bits & (1 << i) && tile.adjacent[i]->air != nullptr && tile.air->compare(*(tile.adjacent[i]->air)) != -2)
