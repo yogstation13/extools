@@ -734,7 +734,7 @@ trvh SSair_check_all_turfs(unsigned int args_len,Value* args,Value src)
 	{
 		std::sort(std::execution::seq,active_turfs.begin(),active_turfs.end());
 	}
-	if(active_turfs[0] != nullptr)
+	if(active_turfs[0] == nullptr)
 	{
 		active_turfs.erase(active_turfs.begin(),std::upper_bound(active_turfs.begin(),active_turfs.end(),(Tile*)nullptr));
 	}
