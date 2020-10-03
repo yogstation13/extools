@@ -96,3 +96,9 @@ private:
 GasMixture &get_gas_mixture(Value src);
 
 size_t get_gas_mixture_index(Value val);
+
+void add_to_active(Tile* tile);
+
+void remove_from_active(Tile* tile);
+
+trvh gasmixture_react(unsigned int args_len, Value* args, Value src); 

@@ -144,12 +144,12 @@ void Tile::process_cell(int fire_count) {
 			last_share_check();
 		}
 	}
-	turf_ref.get_by_id(str_id_air).invoke_by_id(str_id_react, { turf_ref });
+	int reacted = (Value)gasmixture_react(1,&turf_ref,turf_ref.get_by_id(str_id_air));
 	turf_ref.invoke_by_id(str_id_update_visuals, {});
 	bool considering_superconductivity = air->get_temperature() > MINIMUM_TEMPERATURE_START_SUPERCONDUCTION && turf_ref.invoke("consider_superconductivity", {Value::True()});
-	if ((!excited_group && considering_superconductivity)
+	if ((!reacted && !excited_group && considering_superconductivity)
 		|| (atmos_cooldown > (EXCITED_GROUP_DISMANTLE_CYCLES * 2))) {
-		SSair.invoke("remove_from_active", { turf_ref });
+		remove_from_active(this);
 	}
 }
 

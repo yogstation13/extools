@@ -696,6 +696,11 @@ trvh SSair_check_all_turfs(unsigned int args_len,Value* args,Value src)
 				return;
 			}
 			if(tile.air == nullptr) return;
+			if(tile.planet_atmos_info && tile.air->compare(tile.planet_atmos_info->last_mix))
+			{
+				active_turfs[cur_idx++] = &tile;
+				return;
+			}
 			for(int i = 0;i<6;i++)
 			{
 				if (tile.adjacent_bits & (1 << i) && tile.adjacent[i]->air != nullptr && tile.air->compare(*(tile.adjacent[i]->air)) != -2)
