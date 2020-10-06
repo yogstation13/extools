@@ -75,18 +75,12 @@ struct ExcitedGroup : public std::enable_shared_from_this<ExcitedGroup>
 
 class TurfGrid {
 public:
-	Tile *get(int x, int y, int z);
-	Tile *get(int id);
+	Tile *get(int x, int y, int z) const;
+	Tile *get(int id) const;
 	void refresh();
-	inline short get_maxx() { return maxx; }
-	inline short get_maxy() { return maxy; }
-	inline short get_maxz() { return maxz; }
-	inline int get_maxid() { return maxid; }
-	inline std::vector<Tile>::iterator begin() { return tiles.begin();}
-	inline std::vector<Tile>::iterator end() { return tiles.end();}
 
 private:
-	std::vector<Tile> tiles;
+	std::unique_ptr<Tile[]> tiles;
 	short maxx = 0;
 	short maxy = 0;
 	short maxz = 0;
