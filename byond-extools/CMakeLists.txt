@@ -13,11 +13,11 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS_YOGS "-Ofast -gline-tables-only -fstandalone-debug -march=skylake -flto" CACHE STRING
+set(CMAKE_CXX_FLAGS_YOGS "-Ofast -g -march=skylake -flto" CACHE STRING
     "C++ flags for Yogs use."
     FORCE
 )
-set(CMAKE_C_FLAGS_YOGS "-Ofast -gline-tables-only -fstandalone-debug -march=skylake -flto" CACHE STRING
+set(CMAKE_C_FLAGS_YOGS "-Ofast -g -march=skylake -flto" CACHE STRING
     "C flags for Yogs use."
     FORCE
 )
