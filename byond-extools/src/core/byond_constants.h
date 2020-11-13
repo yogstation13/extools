@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 enum DataType : uint8_t
 {
