@@ -722,8 +722,9 @@ void TurfGrid::refresh() {
 		for (int y = 1; y <= new_maxy; y++) {
 			for (int x = 1; x <= new_maxx; x++) {
 				int index = (x - 1) + new_maxx * (y - 1 + new_maxy * (z - 1));
-				Tile &tile = tiles[index];
+				Tile &tile = new_tiles[index];
 				if (x <= maxx && y <= maxy && z <= maxz) {
+					tile = std::move(*get(x, y, z));
 					tile.excited_group.reset(); // excited group contains hanging pointers now (well they're not hanging yet, but they *will* be!)
 					tile.monstermos_info.reset(); // this also has hanging pointers.
 				}
@@ -733,6 +734,7 @@ void TurfGrid::refresh() {
 		}
 	}
 
+	tiles = std::move(new_tiles);
 	maxx = new_maxx; 
 	maxy = new_maxy;
 	maxz = new_maxz;
