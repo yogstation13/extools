@@ -1,5 +1,4 @@
 #pragma once
-
 #include "atmos_defines.h"
 
 #define TOTAL_NUM_GASES 21
