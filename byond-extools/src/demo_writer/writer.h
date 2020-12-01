@@ -270,6 +270,12 @@ inline int AtomUpdateBuffer<Turf, 0x2, false, false>::get_appearance(Turf* turf,
 	int shared_id = Core::turf_table->shared_info_id_table[id];
 	return (*Core::turf_shared_info_table)[shared_id]->appearance;
 }
+inline int AtomUpdateBuffer<Obj, 0x3, true, true>::get_appearance(Obj* obj, int id) {
+	return obj ? GetObjAppearance(id) : 0xFFFF;
+}
+inline int AtomUpdateBuffer<Mob, 0x4, true, true>::get_appearance(Mob* mob, int id) {
+	return mob ? GetMobAppearance(id) : 0xFFFF;
+}
 inline bool AtomUpdateBuffer<Turf, 0x2, false, false>::does_element_exist(int id) {
 	return true;
 }

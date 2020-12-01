@@ -124,6 +124,10 @@ bool Core::find_functions()
 	char* splice_appearance_ptr_ptr = (char*)Pocket::Sigscan::FindPattern(BYONDCORE, "69 c0 e4 00 00 00 03 04 f1 33 c9 66 83 78 18 ff 0f 44 c1 50 8d 4b 14 e8 ?? ?? ?? ?? 85 c0 74 0a 8b 4b 40 c7 04 b9 00 00 00 00 5f 5e 5b 5d c2 04 00", 24);
 	SpliceAppearance = (SpliceAppearancePtr)(splice_appearance_ptr_ptr + *(int*)splice_appearance_ptr_ptr + 4);
 
+	char* get_appearance_ptr = (char*)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8b ec 8b 4d 08 0f b6 c1 83 c0 fe 83 f8 4e 0f 87 ?? ?? ?? ?? 0f b6 80 ?? ?? ?? ?? ff 24 85 ?? ?? ?? ?? ff 75 0c e8 ?? ?? ?? ?? 83 c4 04 5d c3 ff 75 0c e8 ?? ?? ?? ?? 83 c4 04 5d c3", 0);
+	GetObjAppearance = (GetObjAppearancePtr)(get_appearance_ptr + *(int*)(get_appearance_ptr + 39) + 43);
+	GetMobAppearance = (GetMobAppearancePtr)(get_appearance_ptr + *(int*)(get_appearance_ptr + 52) + 56);
+
 	current_execution_context_ptr = *(ExecutionContext * **)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 8D ?? ?? ?? ?? ?? 83 C4 08 89 48 28 8D ?? ?? ?? ?? ?? 89 48 2C 83 3D ?? ?? ?? ?? ?? 74 25 8B 00 FF 30 E8 ?? ?? ?? ?? 83 C4 04 FF 30 E8 ?? ?? ?? ?? 83 C4 04 FF 30 68 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4 08 66 ?? ?? ?? ?? ?? ?? A1 ?? ?? ?? ?? 75 28 A8 02 75 24 E8 ?? ?? ?? ?? 85 C0 75 09 50", 1);
 	misc_entry_table = **(MiscEntry * ***)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? FF 34 B8 FF D6 47 83 C4 04 3B ?? ?? ?? ?? ?? 72 EA FF 35 ?? ?? ?? ?? FF D6 33 FF 83 C4 04 39 ?? ?? ?? ?? ?? 76 1E", 1);
 	some_flags_including_profile = *(unsigned int**)Pocket::Sigscan::FindPattern(BYONDCORE, "F7 05 ?? ?? ?? ?? ?? ?? ?? ?? 74 34 8B 01 FF 30 E8 ?? ?? ?? ?? 83 C4 04 8B D8 E8 ?? ?? ?? ?? 8B F0 8B FA E8 ?? ?? ?? ?? 85 DB 74 02 FF 03 8B ?? ?? ?? ?? ?? 89 71 70 89 79 74 89 41 78 89 51 7C 83 3D ?? ?? ?? ?? ?? 5B 74 37", 2);
@@ -132,11 +136,13 @@ bool Core::find_functions()
 	
 	char* something_decinc;
 	
-	obj_table = std::make_unique<RefTable<Obj>>(*(TableHolder2**)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 33 FF C1 E0 02 89 06 89 7D 0C 39 ?? ?? ?? ?? ?? 0F 86 ?? ?? ?? ?? A1 ?? ?? ?? ?? 8B 3C B8 85 FF 74 6A FF 03 83 7F 28 00", 28));
+	//obj_table = std::make_unique<RefTable<Obj>>(*(TableHolder2**)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 33 FF C1 E0 02 89 06 89 7D 0C 39 ?? ?? ?? ?? ?? 0F 86 ?? ?? ?? ?? A1 ?? ?? ?? ?? 8B 3C B8 85 FF 74 6A FF 03 83 7F 28 00", 28));
+	obj_table = std::make_unique<RefTable<Obj>>(*(Obj****)((char*)GetObjAppearance + 16), *(unsigned int**)((char*)GetObjAppearance + 9));
+	mob_table = std::make_unique<RefTable<Mob>>(*(Mob****)((char*)GetMobAppearance + 16), *(unsigned int**)((char*)GetMobAppearance + 9));
 	datum_table = *(TableHolder2**)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 8B 04 88 85 C0 74 1E FF 03 83 78 04 00 74 09 0F B7 40 0A C1 E0 04 EB 02 33 C0", 1);
 	list_table = *(TableHolder2**)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 8B 04 B8 89 45 0C 85 C0 74 21 FF 03 FF 70 04", 1);
-	something_decinc = (char*)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8b ec 8b 4d 08 3b 0d ?? ?? ?? ?? 73 49 a1 ?? ?? ?? ?? 8b 04 88 85 c0 74 3d ff 88 8c 00 00 00", 8);
-	mob_table = std::make_unique<RefTable<Mob>>(*(Mob****)(something_decinc+7), *(unsigned int**)something_decinc);
+	//something_decinc = (char*)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8b ec 8b 4d 08 3b 0d ?? ?? ?? ?? 73 49 a1 ?? ?? ?? ?? 8b 04 88 85 c0 74 3d ff 88 8c 00 00 00", 8);
+	//mob_table = std::make_unique<RefTable<Mob>>(*(Mob****)(something_decinc+7), *(unsigned int**)something_decinc);
 	//mob_table = *(TableHolder2**)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 8B 3C B8 85 FF 0F 84 ?? ?? ?? ?? FF 03 83 7F 28 00 74 09 0F B7 47 2E C1 E0 04", 1);
 	appearance_table = *(AppearanceTable***)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8b ec 8b 4d 08 81 f9 ff ff 00 00 0f 84 7f 01 00 00 a1 ?? ?? ?? ?? 3b 48 44 0f 83 71 01 00 00 8b 40 40 53 8b 1c 88", 19);
 	appearance_list_table = *(TableHolder2**)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8b ec 53 8b 5d 08 3b 1d ?? ?? ?? ?? 73 48 a1 ?? ?? ?? ?? 57 8b 3c 98 85 ff 74 3a 56 0f b7 37 66 85 f6 74 27 eb 09 8d a4 24 00 00 00 00 8b ff 8b 47 04 81 c6 ff ff 00 00 0f b7 ce ff 34 88 e8 ?? ?? ?? ?? 83 c4 04 66 85 f6 75 e4 53 e8 ?? ?? ?? ?? 83 c4 04 5e 5f 5b 5d c3", 16);

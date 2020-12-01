@@ -107,6 +107,8 @@ typedef SetPixelXPtr SetPixelZPtr;
 typedef SetPixelXPtr SetPixelWPtr;
 typedef void(*SetMovableDirPtr)(trvh atom, unsigned char dir);
 typedef void(*SetLocPtr)(trvh atom, trvh loc);
+typedef int(*GetObjAppearancePtr)(unsigned int id);
+typedef int(*GetMobAppearancePtr)(unsigned int id);
 
 extern CrashProcPtr CrashProc;
 extern StartTimingPtr StartTiming;
@@ -165,7 +167,8 @@ extern SetPixelWPtr SetPixelW;
 extern SetPixelZPtr SetPixelZ;
 extern SetMovableDirPtr SetMovableDir;
 extern SetLocPtr SetLoc;
-
+extern GetMobAppearancePtr GetMobAppearance;
+extern GetObjAppearancePtr GetObjAppearance;
 
 inline void SetAssocElement(unsigned int listType, unsigned int listId, unsigned int keyType, unsigned int keyValue, unsigned int valueType, unsigned int valueValue) {
 	if(SetAssocElement2)
