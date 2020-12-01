@@ -92,7 +92,7 @@ namespace Core
 	extern std::map<std::string, unsigned int> name_to_opcode;
 	extern ExecutionContext** current_execution_context_ptr;
 	extern ExecutionContext** parent_context_ptr_hack;
-	extern ProcSetupEntry** proc_setup_table;
+	extern MiscEntry** misc_entry_table;
 	extern unsigned int* some_flags_including_profile;
 	extern unsigned int* name_table_id_ptr;
 	extern unsigned int* name_table;
@@ -106,6 +106,10 @@ namespace Core
 	extern TurfTableHolder* turf_table;
 	extern TurfHashtableHolder* turf_hashtable;
 	extern TurfSharedInfo*** turf_shared_info_table;
+	extern SuspendedProcList* suspended_proc_list;
+
+	extern RawDatum*** datum_pointer_table;
+	extern unsigned int* datum_pointer_table_length;
 
 	extern RawDatum*** datum_pointer_table;
 	extern unsigned int* datum_pointer_table_length;

@@ -55,4 +55,4 @@ SetPixelYPtr SetPixelY;
 SetPixelWPtr SetPixelW;
 SetPixelZPtr SetPixelZ;
 SetMovableDirPtr SetMovableDir;
-SetLocPtr SetLoc = (SetLocPtr)0x7864f8c0;
+SetLocPtr SetLoc/* = (SetLocPtr)0x7864f8c0*/; // 1012f8c0
