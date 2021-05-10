@@ -2,8 +2,7 @@
 External tools for BYOND. Used to fiddle with the game engine's internals.
 
 <table>
-<tr><td align="right" valign="middle"><a href="https://ci.appveyor.com/project/MCHSL/extools"><img src="https://ci.appveyor.com/api/projects/status/github/MCHSL/extools?svg=true" alt="Appveyor status" /></a></td><td>Windows build (latest <a href="https://ci.appveyor.com/api/projects/MCHSL/extools/artifacts/build/RelWithDebInfo/byond-extools.dll?job=Image%3A%20Visual%20Studio%202017">.dll binary</a>, latest <a href="https://ci.appveyor.com/api/projects/MCHSL/extools/artifacts/build/RelWithDebInfo/byond-extools.pdb?job=Image%3A%20Visual%20Studio%202017">.pdb binary</a>)</td></tr>
-<tr><td align="right" valign="middle"><a href="https://travis-ci.org/MCHSL/extools"><img src="https://travis-ci.org/MCHSL/extools.svg?branch=master" alt="Travis status" /></td><td>Linux build (latest <a href="https://ci.appveyor.com/api/projects/MCHSL/extools/artifacts/build/libbyond-extools.so?job=Image%3A%20Ubuntu">.so binary</a>)</td></tr>
+<tr><td align="right" valign="middle"><a href="https://ci.appveyor.com/project/yogstation13/extools"><img src="https://ci.appveyor.com/api/projects/status/github/MCHSL/extools?svg=true" alt="Appveyor status" /></a></td><td>Windows build (with <a href="https://ci.appveyor.com/project/yogstation13/extools/build/artifacts">binaries</a>)</td></tr>
 </table>
 
 ## Isn't there a project just like this already?
@@ -15,35 +14,8 @@ Here are the modules currently available (not counting the core). Scroll to the 
 #### Proc hooking
 Not exactly a module, but still useful. Hooking allows you to reimplement procs in C++, which usually run much faster, especially if the hooked proc is, for example, just math operations.
 
-#### Debug server
-Interfaces with debugger frontends, providing various information and managing breakpoints.  
-[SpacemanDMM](https://github.com/SpaceManiac/SpacemanDMM) by SpaceManiac enables line-by-line debugging and live viewing of variables. More to come.  
-Steamport's [Somnium](https://github.com/steamp0rt/somnium) is currently non-functional, but will allow debugging of low-level bytecode.  
-
 #### TFFI
 Threaded FFI for BYOND. Automagically threads off all DLL calls and prevents them from locking up the game until they return. You may use a Promise datum, pass a callback (global or an object) or simply sleep until the call returns.
-
-#### Extended Profiler
-Generates an in-depth analysis of proc performance. Records all procs called by the profiled proc and outputs a detailed breakdown of execution time, with nanosecond accuracy. Use https://www.speedscope.app/ to visualize the results.
-
-Call `initialize_profiling()` and then use `start_profiling(/some/proc/path)` to begin profiling. Each time the proc is called will be recorded to a file in the `profiling` directory next to the .dmb file. Call `stop_profiling(/some/proc/path)` to stop new profiles from being created.
-
-Known issues:
-
-- Procs with sleeps in them may behave oddly and cause corrupted results.
-- Spawn()s are entirely untested and may not work at all.
-- The files containing profile results can become extremely large, in the range of gigabytes, preventing speedscope from importing them. Be careful when profiling procs that could run for longer than several seconds.
-
-#### Memory Profiler
-
-Counts all soft-code objects currently instantiated in the game world and dumps
-these numbers into a JSON file of your choosing for later inspection. The code
-also attempts to approximate the number of bytes that each object type takes
-up, though the accuracy is not guaranteed.
-
-To use, simply invoke `dump_memory_usage("myfile.json")` with the appropriate
-`call()()` syntax and away you go. This will halt the server for a moment as the
-counting is done.
 
 #### Optimizer
 Currently a proof of concept. The only optimization available is inlining - the optimizer will go through all procs and attempt to inline global proc calls to eliminate call overhead. At the time of writing optimizing takes an incredibly long time to finish, which makes it infeasible to use.
@@ -105,7 +77,18 @@ D:\Code\C++\extools\byond-extools\build>
 ```
 
 ## Linux
-You can just make the build directory and do `cmake ..` and then `make`.  
+```
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo dpkg --add-architecture i386
+sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+sudo apt-get install g++-10-multilib llvm-10-dev
+mkdir build
+cd build
+export CC=clang
+export CXX=clang++
+cmake ../byond-extools -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build .
+```
 32-bit is automatically forced when compiling on Linux.
 
 ## Credits
