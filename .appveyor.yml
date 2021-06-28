@@ -5,27 +5,12 @@ branches:
   only:
   - master
 shallow_clone: true
-image: 
-  - Visual Studio 2017
-  - Ubuntu
+image: Visual Studio 2017
 build_script:
   - mkdir build
   - cd build
   - cmake ../byond-extools
-  - cmd: cmake --build . --config RelWithDebInfo
-  - sh: sudo apt-get install -y gcc-multilib g++-multilib
-  - sh: make
-
-for:
-- matrix:
-    only:
-      - image: Visual Studio 2017
-  artifacts:
-    - path: build/RelWithDebInfo/byond-extools.dll
-    - path: build/RelWithDebInfo/byond-extools.pdb
-
-- matrix:
-    only:
-      - image: Ubuntu
-  artifacts:
-    - path: build/libbyond-extools.so
+  - cmake --build . --config RelWithDebInfo
+artifacts:
+  - path: build/RelWithDebInfo/byond-extools.dll
+  - path: build/RelWithDebInfo/byond-extools.pdb
