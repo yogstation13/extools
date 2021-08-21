@@ -1,6 +1,10 @@
 # BYOND extools
 External tools for BYOND. Used to fiddle with the game engine's internals.
 
+# This project is archived
+Extools will no longer be receiving updates. I recommend switching to Rust-based [Auxtools](https://github.com/willox/auxtools), which I contribute to as well.
+<br/><br/><br/><br/>
+
 <table>
 <tr><td align="right" valign="middle">Find an action run with an artifact and download it</td></tr>
 </table>
@@ -19,6 +23,16 @@ Threaded FFI for BYOND. Automagically threads off all DLL calls and prevents the
 
 #### Optimizer
 Currently a proof of concept. The only optimization available is inlining - the optimizer will go through all procs and attempt to inline global proc calls to eliminate call overhead. At the time of writing optimizing takes an incredibly long time to finish, which makes it infeasible to use.
+#### Memory Profiler
+
+Counts all soft-code objects currently instantiated in the game world and dumps
+these numbers into a JSON file of your choosing for later inspection. The code
+also attempts to approximate the number of bytes that each object type takes
+up, though the accuracy is not guaranteed.
+
+To use, simply invoke `dump_memory_usage("myfile.json")` with the appropriate
+`call()()` syntax and away you go. This will halt the server for a moment as the
+counting is done.
 
 #### Maptick
 Hooks an internal BYOND function which sends map updates to players, and measures time taken to execute it. The result is written to a global variable called `internal_tick_usage`. SS13 servers can use this information to adjust how much of a tick running subsystems can take, which reduces lag spikes perceived by players.
@@ -39,7 +53,6 @@ These modules are planned to be included in the future.
 - Proxy objects: Forward variable reads and writes to C++.
 - Websockets: Send and receive data using the websocket protocol.
 - Lua: Allows writing lua scripts that replace builtin procs. Mostly for messing about.
-- ~~Optimizer: Optimizes bytecode and inlines procs into each other to avoid call overhead.~~
 
 ## I want to use this!
 Download the DLL and .dm file from [Releases](https://github.com/MCHSL/extools/releases). Place the DLL next to your DMB and plop the .dm somewhere where you can easily tick it. Afterwards, add `extools_initialize()` to `world/New()` or equivalent. To load modules, call `<module>_initialize()`, for example `tffi_initialize()`. Module initialization functions must be called after `extools_initialize()`!
