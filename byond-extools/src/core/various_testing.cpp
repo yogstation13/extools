@@ -1,5 +1,6 @@
 #include "core.h"
 #include "../dmdism/disassembly.h"
+#include "../debug_server/debug_server.h"
 #include "../crash_guard/crash_guard.h"
 
 #include <fstream>
