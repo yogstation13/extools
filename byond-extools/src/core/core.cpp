@@ -14,7 +14,6 @@ unsigned int* Core::datum_pointer_table_length;
 
 int ByondVersion;
 int ByondBuild;
-unsigned int* Core::some_flags_including_profile;
 unsigned int Core::extended_profiling_insanely_hacky_check_if_its_a_new_call_or_resume;
 
 //std::vector<bool> Core::codecov_executed_procs;
@@ -25,14 +24,7 @@ unsigned int next_opcode_id = 0x1337;
 bool Core::initialized = false;
 unsigned int* Core::name_table_id_ptr = nullptr;
 unsigned int* Core::name_table = nullptr;
-Value* Core::global_var_table = nullptr;
 std::unordered_map<std::string, Value*> Core::global_direct_cache;
-
-TableHolder2* Core::obj_table = nullptr;
-TableHolder2* Core::datum_table = nullptr;
-TableHolder2* Core::list_table = nullptr;
-TableHolder2* Core::mob_table = nullptr;
-SuspendedProcList* Core::suspended_proc_list = nullptr;
 
 Core::ManagedString::ManagedString(unsigned int id) : string_id(id)
 {
@@ -118,10 +110,8 @@ void Core::Alert(int what)
 	Alert(std::to_string(what));
 }
 
-unsigned int Core::GetStringId(std::string str, bool increment_refcount)
-{
-	if (ByondVersion > 513)
-	{
+unsigned int Core::GetStringId(std::string str, bool increment_refcount) {
+	if (ByondVersion == 514) {
 		return GetStringTableIndexUTF8(str.c_str(), 0xFFFFFFFF, 0, 1);
 	}
 	return 0;
@@ -167,18 +157,6 @@ void Core::stack_push(Value val)
 	(*Core::current_execution_context_ptr)->stack[(*Core::current_execution_context_ptr)->stack_size-1] = val;
 }
 
-bool Core::enable_profiling()
-{
-	*some_flags_including_profile |= FLAG_PROFILE;
-	return true;
-}
-
-bool Core::disable_profiling()
-{
-	*some_flags_including_profile &= ~FLAG_PROFILE;
-	return true;
-}
-
 std::string Core::type_to_text(unsigned int type)
 {
 	return GetStringFromId(GetTypeById(type)->path);
@@ -218,44 +196,6 @@ std::uint32_t Core::get_socket_from_client(unsigned int id)
 	int str = (int)GetSocketHandleStruct(id);
 	return ((Hellspawn*)(str - 0x74))->handle;
 }
-
-Value* locate_global_by_name(std::string name)
-{
-	unsigned int varname = Core::GetStringId(name);
-	TableHolderThingy* tht = GetTableHolderThingyById(*Core::name_table_id_ptr);
-	int id;
-	for (id = 0; id < tht->length; id++) // add binary search here
-	{
-		if (Core::name_table[tht->elements[id]] == varname)
-		{
-			break;
-		}
-	}
-	return &Core::global_var_table[tht->elements[id]];
-}
-
-void Core::global_direct_set(std::string name, Value val)
-{
-	if (auto ptr = global_direct_cache.find(name); ptr != global_direct_cache.end())
-	{
-		*ptr->second = val;
-	}
-	Value* var = locate_global_by_name(name);
-	*var = val;
-	global_direct_cache[name] = var;
-}
-
-Value Core::global_direct_get(std::string name)
-{
-	if (auto ptr = global_direct_cache.find(name); ptr != global_direct_cache.end())
-	{
-		return *ptr->second;
-	}
-	Value* var = locate_global_by_name(name);
-	global_direct_cache[name] = var;
-	return *var;
-}
-
 
 void Core::disconnect_client(unsigned int id)
 {

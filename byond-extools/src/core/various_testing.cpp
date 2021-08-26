@@ -1,6 +1,5 @@
 #include "core.h"
 #include "../dmdism/disassembly.h"
-#include "../debug_server/debug_server.h"
 #include "../crash_guard/crash_guard.h"
 
 #include <fstream>
@@ -78,25 +77,6 @@ public:
 	}
 };
 
-#ifdef _WIN32
-opcode_handler _generate_number_op_localm_localn_store_localx(unsigned char op, int localm, int localn, int localx)
-{
-	unsigned char* func = (unsigned char*)VirtualAlloc(NULL, 64, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-	if (!func)
-	{
-		return nullptr;
-	}
-	std::memcpy(func, _number_op_localm_localn_store_localx, 26);
-	func[16] = op;
-	func[13] = 4 + 8 * localm;
-	func[18] = 4 + 8 * localn;
-	func[23] = 4 + 8 * localx;
-	DWORD old_prot;
-	VirtualProtect(func, 64, PAGE_EXECUTE_READ, &old_prot);
-	return (opcode_handler)func;
-}
-#endif
-
 extern "C" EXPORT void add_subvars_of_locals(ExecutionContext* ctx)
 {
 	Value a = ctx->local_variables[0];
@@ -123,109 +103,6 @@ void init_testing()
 	{
 		o << i.offset() << "\t\t\t" << i.bytes_str() << "\t\t\t" << i.opcode().mnemonic() << " " << i.comment() << "\n";
 	}
-	//Value a(5.0f);
-	//Value b = a + 5.0f;
-	//b += 1.0f;
-	//Core::Alert(std::to_string(b));
-	//ManagedValue a = Value::World().get("name");
-	//dump_full_obj_mem_usage();
-	//Core::Alert("end func");
-	//Core::global_direct_set("internal_tick_usage", "AYYLMAO");
-	//Core::Alert(Core::global_direct_get("internal_tick_usage"));
-	//Core::Alert(Core::GetStringFromId(0x86));
-	//Core::get_proc("/proc/get_string_by_id").hook(test_invoke);
-	//Core::Alert(Core::get_proc("/client/verb/hidden").proc_table_entry->procFlags);
-	//Core::Alert(Core::get_proc("/client/verb/nothidden").proc_table_entry->procFlags);
-	//Core::get_proc("/client/verb/toggle_hidden_verb").hook(toggle_verb_hidden);
-	//Core::get_proc("/client/verb/hidden").proc_table_entry->procFlags = 4;
-	//initialize_profiler_access();
-	//enable_crash_guard();
-	//optimizer_initialize();
-	//Core::Alert(Core::stringify({ 0x0C, 0x00 }));
-	//Core::Proc p = "/proc/pickdism";
-	//std::ofstream o("out.txt");
-	//for (Instruction& i : p.disassemble())
-	//{
-	//	o << i.offset() << "\t\t\t" << i.bytes_str() << "\t\t\t" << i.opcode().mnemonic() << "\n";
-	//}
-	/*Core::Proc p = "/proc/bench_intrinsic_add";
-	Disassembly d = p.disassemble();
-	Core::Proc intrinsic_add = "/proc/__intrinsic_add_locals";
-	std::vector<std::uint32_t>* new_bytecode = new std::vector<std::uint32_t>;
-	for (int i = 0; i < d.size(); i++)
-	{
-		if (d.at(i) == CALLGLOB && d.at(i).bytes().at(2) == intrinsic_add.id)
-		{
-			Instruction first_arg = d.at(i - 2);
-			Instruction second_arg = d.at(i - 1);
-			Instruction destination = d.at(i + 1);
-			new_bytecode->resize(new_bytecode->size() - 6);
-			int intrinsic_op = Core::register_opcode("INTRINSIC_ADD_NUMBERS_"+std::to_string(rand()), _generate_number_op_localm_localn_store_localx(ADD, first_arg.bytes().at(2), second_arg.bytes().at(2), destination.bytes().at(2)));
-			new_bytecode->push_back(intrinsic_op);
-			i += 1;
-		}
-		else
-		{
-			for (unsigned int& byte : d.at(i).bytes())
-			{
-				new_bytecode->push_back(byte);
-			}
-		}
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		new_bytecode->push_back(0x00);
-	}
-	p.set_bytecode(new_bytecode);
-	std::ofstream o("out.txt");
-	for (Instruction& i : Core::get_proc("/proc/bench_dm_add").disassemble())
-	{
-		o << i.offset() << "\t\t\t" << i.bytes_str() << "\t\t\t" << i.opcode().mnemonic() << "\n";
-	}*//*
-	bool find_unknowns = false;
-	if (find_unknowns)
-	{
-		std::ofstream log("unknown_opcodes.txt");
-		for (Core::Proc& p : Core::get_all_procs())
-		{
-			if (!p.name.empty() && p.name.back() == ')')
-			{
-				continue;
-			}
-			Disassembly d = p.disassemble();
-			for (Instruction& i : d)
-			{
-				if (i == UNK)
-				{
-					log << "Unknown instruction in " + p.name + "\n";
-					break;
-				}
-			}
-		}
-		log.close();
-	}*/
-
-	//debugger_connect();
-	//Core::get_proc("/datum/explosion/New").extended_profile();
-	//Core::get_proc("/client/verb/test_reentry").extended_profile();
-	//Core::get_proc("/client/verb/test_extended_profiling").extended_profile();
-	//extended_profiling_procs[.id] = true;
-	//Core::get_proc("/proc/cheap_hypotenuse_hook").hook(cheap_hypotenuse);
-	//Core::get_proc("/proc/measure_get_variable").hook(measure_get_variable);
-	//Core::get_proc("/proc/laugh").hook(show_profiles);
-
-	/*int hypotenuse_opcode = Core::register_opcode("CHEAP_HYPOTENUSE", cheap_hypotenuse_opcode);
-	Core::Proc& hypotenuse_bench = Core::get_proc("/proc/bench_cheap_hypotenuse_native");
-	Disassembly dis = hypotenuse_bench.disassemble();
-	for (Instruction& instr : dis)
-	{
-		if (instr == Bytecode::CALLGLOB)
-		{
-			instr = Instruction(hypotenuse_opcode);
-			break;
-		}
-	}
-	hypotenuse_bench.assemble(dis);*/
 }
 
 void run_tests()
