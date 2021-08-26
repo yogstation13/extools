@@ -119,20 +119,10 @@ void Core::Alert(int what)
 }
 
 unsigned int Core::GetStringId(std::string str, bool increment_refcount) {
-	switch (ByondVersion) {
-		case 512:
-			{
-				int idx = GetStringTableIndex(str.c_str(), 0, 1);
-				if (increment_refcount)
-				{
-					String* str = GetStringTableEntry(idx);
-					str->refcount++;
-				}
-				return idx; //this could cause memory problems with a lot of long strings but otherwise they get garbage collected after first use.
-			}
-		case 513 ... 514:
-			return GetStringTableIndexUTF8(str.c_str(), 0xFFFFFFFF, 0, 1);
-		default: break;
+	if (ByondVersion > 513) {
+		return GetStringTableIndexUTF8(str.c_str(), 0xFFFFFFFF, 0, 1);
+	else
+		break;
 	}
 	return 0;
 }
