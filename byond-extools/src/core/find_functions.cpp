@@ -211,7 +211,7 @@ bool Core::find_functions()
 		FIND_OR_DIE(SetVariable, "55 89 E5 81 EC ?? ?? ?? ?? 8B 55 ?? 8B 45 ??");
 		FIND_OR_DIE(GetStringTableIndexUTF8, "55 89 E5 57 56 89 CE 53 89 D3 83 EC ?? 8B 55 ?? 85 C0"); // regparm3
 		break;
-	case 514;
+	case 514:
 		FIND_OR_DIE(SetVariable, "55 89 E5 81 EC ?? ?? ?? ?? 8B 55 ?? 89 5D ?? 8B 4D");
 		FIND_OR_DIE(GetStringTableIndexUTF8, "55 89 E5 57 56 89 CE 53 89 D3 83 EC ?? 8B 55 ?? 85 C0");
 		break;
