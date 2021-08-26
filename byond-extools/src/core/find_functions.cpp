@@ -103,13 +103,8 @@ bool Core::find_functions()
 	if (ByondVersion > 513)
 	{
 		FIND_OR_DIE(GetStringTableIndexUTF8, "55 8B EC 8B 45 ?? 83 EC ?? 53 56 8B 35 ?? ?? ?? ??");
-		break;
 	}
-	{
-		else break;
-	}
-	|
-		if (failed) return false;
+	if (failed) return false;
 	int offset = *(int *)((char *)TopicFloodCheck + 0x2C);
 	GetBSocket = (GetBSocketPtr)((char *)TopicFloodCheck + 0x2C + offset + 4); //done this way because pattern scanning would result in a different function
 

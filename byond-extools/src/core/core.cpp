@@ -124,11 +124,6 @@ unsigned int Core::GetStringId(std::string str, bool increment_refcount)
 	{
 		return GetStringTableIndexUTF8(str.c_str(), 0xFFFFFFFF, 0, 1);
 	}
-	else
-	{
-
-		break;
-	}
 	return 0;
 }
 
