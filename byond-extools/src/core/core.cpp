@@ -111,7 +111,7 @@ void Core::Alert(int what)
 }
 
 unsigned int Core::GetStringId(std::string str, bool increment_refcount) {
-	if (ByondVersion == 514) {
+	if (ByondVersion > 513) {
 		return GetStringTableIndexUTF8(str.c_str(), 0xFFFFFFFF, 0, 1);
 	}
 	return 0;
