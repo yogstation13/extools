@@ -118,7 +118,7 @@ bool Core::find_functions()
 	x_ref_count_call = (char *)Pocket::Sigscan::FindPattern(BYONDCORE, "FF 75 10 E8 ?? ?? ?? ?? FF 75 0C 8B F8 FF 75 08 E8 ?? ?? ?? ?? 57", 17);
 	IncRefCount = (IncRefCountPtr)(x_ref_count_call + *(int *)x_ref_count_call + 4);
 
-	char *datum_inc_function = (char *)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8b ec 8b 4d 08 3b 0d ?? ?? ?? ?? 73 11 a1 ?? ?? ?? ?? 8b 04 88 85 c0 74 05 ff 40 14 5d c3 6a 21 51 e8 ?? ?? ?? ??");
+	char *datum_inc_function = (char *)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8b ec 8b 4d 08 3b 0d ?? ?? ?? ?? 73 11 a1 ?? ?? ?? ?? 8b 04 88 85 c0 74 05 ff 40 10 5d c3 6a");
 	datum_pointer_table_length = *(unsigned int **)(datum_inc_function + 8);
 	datum_pointer_table = *(RawDatum ****)(datum_inc_function + 15);
 
