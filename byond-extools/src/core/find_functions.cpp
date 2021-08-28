@@ -94,15 +94,13 @@ bool Core::find_functions()
 	offset = *(int*)((char*)GetGlobalByName + 11);
 	GetTableHolderThingyById = (GetTableHolderThingyByIdPtr)((char*)GetGlobalByName + 11 + offset + 4);
 
-	char* x_ref_count_call = (char*)Pocket::Sigscan::FindPattern(BYONDCORE, "3D ?? ?? ?? ?? 74 14 50 E8 ?? ?? ?? ?? FF 75 0C FF 75 08 E8", 20);
-	DecRefCount = (DecRefCountPtr)(x_ref_count_call + *(int*)x_ref_count_call + 4); //x_ref_count_call points to the relative offset to DecRefCount from the call site
-	x_ref_count_call = (char*)Pocket::Sigscan::FindPattern(BYONDCORE, "FF 75 10 E8 ?? ?? ?? ?? FF 75 0C 8B F8 FF 75 08 E8 ?? ?? ?? ?? 57", 17);
-	IncRefCount = (IncRefCountPtr)(x_ref_count_call + *(int*)x_ref_count_call + 4);
-
-	char* datum_inc_function = (char*)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8b ec 8b 4d 08 3b 0d ?? ?? ?? ?? 73 11 a1 ?? ?? ?? ?? 8b 04 88 85 c0 74 05 ff 40 14 5d c3 6a 21 51 e8 ?? ?? ?? ??");
-	datum_pointer_table_length = *(unsigned int**)(datum_inc_function + 8);
-	datum_pointer_table = *(RawDatum****)(datum_inc_function + 15);
-
+	char *x_ref_count_call = (char *)Pocket::Sigscan::FindPattern(BYONDCORE, "3D ?? ?? ?? ?? 74 14 50 E8 ?? ?? ?? ?? FF 75 0C FF 75 08 E8", 20);
+	DecRefCount = (DecRefCountPtr)(x_ref_count_call + *(int *)x_ref_count_call + 4); //x_ref_count_call points to the relative offset to DecRefCount from the call site
+	x_ref_count_call = (char *)Pocket::Sigscan::FindPattern(BYONDCORE, "FF 75 10 E8 ?? ?? ?? ?? FF 75 0C 8B F8 FF 75 08 E8 ?? ?? ?? ?? 57", 17);
+	IncRefCount = (IncRefCountPtr)(x_ref_count_call + *(int *)x_ref_count_call + 4);
+	char *datum_inc_function = (char *)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8B EC 8B 4D 08 3B 0D ?? ?? ?? ?? 73 11 A1 ?? ?? ?? ?? 8B 04 88 85 C0 74 05 FF 40 18 5D C3 6A");
+	datum_pointer_table_length = *(unsigned int **)(datum_inc_function + 8);
+	datum_pointer_table = *(RawDatum ****)(datum_inc_function + 15);
 	// the signature below is for a function that fetches a list via the real GetListPointerById and then checks if the list exists, runtiming otherwise
 	char* get_list_ptr_ptr = (char*)Pocket::Sigscan::FindPattern(BYONDCORE, "55 8B EC FF 75 08 E8 ?? ?? ?? ?? 83 C4 04 85 C0 75 13 68 ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 C4 04 5D E9 ?? ?? ?? ?? 5D C3", 7);
 	GetListPointerById = (GetListPointerByIdPtr)(get_list_ptr_ptr + *(int*)get_list_ptr_ptr + 4);
