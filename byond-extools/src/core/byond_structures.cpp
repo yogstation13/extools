@@ -361,24 +361,24 @@ ManagedValue::~ManagedValue()
 
 Params MiscEntry::as_params()
 {
-		return Params {
-			parameters2.count(),
-			parameters2.params,
-		};
-	}
+	return Params {
+		parameters2.count(),
+		parameters2.params,
+	};
+}
 
 LocalVars MiscEntry::as_locals()
 {
-		return LocalVars {
-			local_vars2.count,
-			local_vars2.var_name_indices,
-		};
-	}
+	return LocalVars {
+		local_vars2.count,
+		local_vars2.var_name_indices,
+	};
+}
 
 ProcBytecode MiscEntry::as_bytecode()
 {
-		return ProcBytecode {
-			bytecode2.bytecode_length,
-			&bytecode2.bytecode,
-		};
-}
+	return ProcBytecode {
+		bytecode2.bytecode_length,
+		&bytecode2.bytecode,
+	};
+} 
