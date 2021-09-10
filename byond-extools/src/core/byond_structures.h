@@ -134,6 +134,7 @@ struct Value
 	std::unordered_map<std::string, Value> get_all_vars();
 	bool has_var(std::string name);
 	void set(std::string name, Value value);
+	void set_by_id(int id, Value newvalue);
 };
 
 struct ManagedValue : Value

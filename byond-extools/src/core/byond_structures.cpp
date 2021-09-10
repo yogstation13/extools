@@ -116,6 +116,11 @@ void Value::set(std::string name, Value newvalue)
 	SetVariable(type, value, Core::GetStringId(name), newvalue);
 }
 
+void Value::set_by_id(int id, Value newvalue)
+{
+	SetVariable(type, value, id, newvalue);
+}
+
 ManagedValue Value::invoke(std::string name, std::vector<Value> args, Value usr)
 {
 	std::replace(name.begin(), name.end(), '_', ' ');
