@@ -15,19 +15,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 if (WIN32)
-    file(GLOB_RECURSE SRC_FILES
+    file(GLOB_RECURSE SRC_FILES LIST_DIRECTORIES true
         "${SRC_DIR}/*.cpp"
         "${SRC_DIR}/*.h"
         "${SRC_DIR}/*.hpp"
         "${SRC_DIR}/*.s"
     )
 else()
-    file(GLOB_RECURSE SRC_FILES
+    file(GLOB_RECURSE SRC_FILES LIST_DIRECTORIES true
         "${SRC_DIR}/*.cpp"
         "${SRC_DIR}/*.h"
         "${SRC_DIR}/*.hpp"
     )
 endif()
+list(FILTER SRC_FILES EXCLUDE REGEX ".*joao_repo.*") ## For João, so we can do some manual inclusion in joao.cpp
 set(SRC_FILES ${SRC_FILES} "${SRC_DIR}/third_party/subhook/subhook.c")
 
 add_library(byond-extools SHARED ${SRC_FILES})

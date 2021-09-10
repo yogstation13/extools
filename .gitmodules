@@ -1,0 +1,3 @@
+[submodule "byond-extools/src/joao/joao_repo"]
+	path = byond-extools/src/joao/joao_repo
+	url = https://github.com/Altoids1/Joao.git
