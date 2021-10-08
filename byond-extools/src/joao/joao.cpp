@@ -81,14 +81,31 @@ trvh run_script(unsigned int argn, ByondValue* args, ByondValue src)
 	ByondValue& packet = args[1];
 	if (packet.type != DataType::DATUM)
 		return ByondValue::False();
+	if (!(packet.has_var("signal"))) // Lazy type-checking of $packet
+	{
+		return ByondValue::False();
+	}
+
 	ByondValue& signal = args[1].get("signal");
 	if (signal.type != DataType::DATUM) // If what we were given isn't even a datum (signals are, this comment upholding, /datum/signal/subspace/vocal)
 		return ByondValue::False();
+	
 
 	std::istringstream stream = std::istringstream(std::string(script));
 
+
 	Scanner scanner;
-	scanner.scan(stream);
+	try
+	{
+		scanner.scan(stream);
+	}
+	catch (joao::error::scanner s_err)
+	{
+		ByondValue& error = packet.get("err");
+		error.set("what", s_err.what());
+		error.set("code", -3);
+		return ByondValue::False();
+	}
 	Parser pears(scanner);
 
 	
@@ -101,7 +118,18 @@ trvh run_script(unsigned int argn, ByondValue* args, ByondValue src)
 	signal_type.set_typeproperty_raw("source", empty_string);
 
 	pears.IncludeAlienType(&signal_type);
-	Program parsed = pears.parse();
+	Program parsed;
+	try
+	{
+		parsed = pears.parse();
+	}
+	catch (joao::error::parser p_err)
+	{
+		ByondValue& error = packet.get("err");
+		error.set("what", p_err.what());
+		error.set("code", -3);
+		return ByondValue::False();
+	}
 
 	Interpreter interpreter(parsed, false);
 	
