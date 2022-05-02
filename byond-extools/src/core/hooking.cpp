@@ -3,6 +3,7 @@
 #include <chrono>
 #include <fstream>
 #include "../third_party/json.hpp"
+#include "../extended_profiling/extended_profiling.h"
 #include <stack>
 #include <mutex>
 

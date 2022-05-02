@@ -1,4 +1,5 @@
 #include "proc_management.h"
+#include "../extended_profiling/extended_profiling.h"
 #include "../dmdism/disassembly.h"
 #include "../dmdism/disassembler.h"
 #include <optional>
@@ -81,6 +82,11 @@ std::string Core::Proc::get_param_name(std::uint32_t index)
 ProfileInfo* Core::Proc::profile() const
 {
 	return GetProfileInfo(id);
+}
+
+void Core::Proc::extended_profile()
+{
+	procs_to_profile[id] = true;
 }
 
 void Core::Proc::hook(ProcHook hook_func)

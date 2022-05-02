@@ -1,5 +1,6 @@
 #include "core.h"
 #include "find_functions.h"
+#include "../extended_profiling/extended_profiling.h"
 #include "socket/socket.h"
 #include "../datum_socket/datum_socket.h"
 #include <fstream>
@@ -289,6 +290,7 @@ void Core::cleanup()
 	Core::remove_all_hooks();
 	Core::opcode_handlers.clear();
 	Core::destroy_proc_list();
+	procs_to_profile.clear();
 	proc_hooks.clear();
 	global_direct_cache.clear();
 	clean_sockets();

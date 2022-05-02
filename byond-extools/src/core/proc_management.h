@@ -54,6 +54,7 @@ namespace Core
 		Disassembly disassemble();
 
 		ProfileInfo* profile() const;
+		void extended_profile();
 		void hook(ProcHook hook_func);
 		Value call(std::vector<Value> arguments, Value usr = Value::Null());
 
