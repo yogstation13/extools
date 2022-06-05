@@ -13,6 +13,8 @@
 #define IMPORT_OR_DIE(name, sig) name = (name##Ptr)dlsym(dlopen(BYONDCORE, 0), sig); if(!name) { Core::Alert("Failed to locate " #name " via " #sig); return false; }
 #endif
 
+extern "C" void *subhook_unprotect(void *address, size_t size);
+
 bool Core::verify_compat()
 {
 #ifdef _WIN32
@@ -141,6 +143,19 @@ bool Core::find_functions()
 	FIND_OR_DIE(SetVariable, "55 89 E5 81 EC A8 00 00 00 8B 55 ?? 89 5D ?? 8B 4D ?? 89 7D ?? 8B 5D ??");
 	FIND_OR_DIE(GetStringTableIndexUTF8, "55 89 E5 57 56 89 CE 53 89 D3 83 EC ?? 8B 55 ?? 85 C0") // regparm3
 	if(failed) return false;
+	
+	// De-inlines DelDatum, very hackily.
+	char *datum_dec_function_deinline = (char *)Pocket::Sigscan::FindPattern(BYONDCORE, "55 89 e5 53 83 ec 44 8b 45 08 3b 05 ?? ?? ?? ?? 72 46", 114);
+	subhook_unprotect(datum_dec_function_deinline, 3+5+2);
+	// mov [esp], eax
+	datum_dec_function_deinline[0] = 0x89;
+	datum_dec_function_deinline[1] = 0x04;
+	datum_dec_function_deinline[2] = 0x24;
+	// call DelDatum
+	datum_dec_function_deinline[3] = 0xe8;
+	*((int*)(datum_dec_function_deinline+4)) = ((int)(void*)DelDatum) - ((int)(void*)datum_dec_function_deinline + 8);
+	datum_dec_function_deinline[8] = 0xeb;
+	datum_dec_function_deinline[9] = 0xd4;
 
 	datum_pointer_table_length = *(unsigned int**)((char*)DelDatum + 12);
 	datum_pointer_table = *(RawDatum****)((char*)DelDatum + 20);
