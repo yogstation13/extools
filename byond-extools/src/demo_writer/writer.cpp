@@ -6,6 +6,8 @@ std::vector<DemoWriterIdFlags> demo_id_flags;
 std::ofstream demo_file_handle;
 
 float last_world_time = 0;
+bool demo_time_override_enabled = false;
+float demo_time_override = 0;
 
 AtomUpdateBuffer<Turf, 0x2, false, false> turf_update_buffer;
 AtomUpdateBuffer<Obj, 0x3, true, true> obj_update_buffer;
@@ -303,8 +305,8 @@ int write_appearance(std::vector<unsigned char> &buf, int appearance_id) {
 }
 
 void update_demo_time() {
-	float time = GetVariable(DataType::WORLD_D, 0, 0x4f).valuef; // world.time
-	if (last_world_time == time) return;
+	float time = demo_time_override_enabled ? demo_time_override : GetVariable(DataType::WORLD_D, 0, 0x4f).valuef; // world.time
+	if (last_world_time >= time) return;
 	last_world_time = time;
 	demo_file_handle.put(0x00); // Chunk ID
 	demo_file_handle.put(0x04); // Chunk Length

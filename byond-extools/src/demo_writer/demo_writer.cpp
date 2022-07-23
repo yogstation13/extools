@@ -2,24 +2,19 @@
 #include "demo_writer.h"
 #include "../core/core.h"
 #include "writer.h"
-
-/*void log_world(const char* format, ...) {
-	char buffer[256];
-	va_list args;
-	va_start(args, format);
-	vsnprintf(buffer, 256, format, args);
-	std::vector<Value> log_world_args;
-	log_world_args.push_back(buffer);
-	IncRefCount(log_world_args[0].type, log_world_args[0].value);
-	Core::get_proc("/proc/log_world").call(log_world_args);
-	va_end(args);
-}*/
+#include "animation_writer.h"
 
 trvh flush_demo_updates(unsigned int args_len, Value* args, Value src) {
 	turf_update_buffer.flush();
 	obj_update_buffer.flush();
 	mob_update_buffer.flush();
+	flush_flick_queue();
+	flush_animation_queue();
 	return Value::Null();
+}
+
+trvh get_demo_size(unsigned int args_len, Value* args, Value src) {
+	return Value((float)demo_file_handle.tellp());
 }
 
 SetAppearancePtr oSetAppearance;
@@ -30,6 +25,7 @@ void hSetAppearance(trvh atom, int appearance) {
 	case LIST_TURF_VERBS:
 	case LIST_TURF_OVERLAYS:
 	case LIST_TURF_UNDERLAYS:
+		turf_update_buffer.mark_dirty(atom.value);
 		break;
 	case OBJ:
 	case LIST_VERBS:
@@ -50,6 +46,23 @@ SpliceAppearancePtr oSpliceAppearance;
 void __fastcall hSpliceAppearance(void* this_, int edx, Appearance* appearance) {
 	get_demo_id_flags(appearance->id).appearance_written = false;
 	oSpliceAppearance(this_, edx, appearance);
+}
+
+SpliceStringPtr oSpliceString;
+void hSpliceString(unsigned int id) {
+	get_demo_id_flags(id).string_written = false;
+	oSpliceString(id);
+}
+
+FlickPtr oFlick;
+bool hFlick(trvh icon, trvh atom) {
+	add_flick_to_queue(icon, atom);
+	return oFlick(icon, atom);
+}
+
+AnimatePtr oAnimate;
+void hAnimate(trvh args) {
+	add_animate_to_queue(args, oAnimate);
 }
 
 SetPixelXPtr oSetPixelX;
@@ -100,6 +113,9 @@ bool enable_demo(const char *out_file, const char *commit_hash)
 {
 	oSetAppearance = Core::install_hook(SetAppearance, hSetAppearance);
 	oSpliceAppearance = Core::install_hook(SpliceAppearance, hSpliceAppearance);
+	oSpliceString = Core::install_hook(SpliceString, hSpliceString);
+	oFlick = Core::install_hook(Flick, hFlick);
+	oAnimate = Core::install_hook(Animate, hAnimate);
 	oSetPixelX = Core::install_hook(SetPixelX, hSetPixel<oSetPixelX, 0>);
 	oSetPixelY = Core::install_hook(SetPixelY, hSetPixel<oSetPixelY, 1>);
 	oSetPixelW = Core::install_hook(SetPixelW, hSetPixel<oSetPixelW, 2>);
@@ -108,6 +124,7 @@ bool enable_demo(const char *out_file, const char *commit_hash)
 	oSetLoc = Core::install_hook(SetLoc, hSetLoc);
 
 	Core::get_proc("/proc/flush_demo_updates").hook(flush_demo_updates);
+	Core::get_proc("/proc/get_demo_size").hook(get_demo_size);
 	demo_file_handle.open(out_file, std::ios::binary | std::ios::trunc);
 	// write the header
 	demo_file_handle.put(0xCB);
@@ -120,11 +137,16 @@ bool enable_demo(const char *out_file, const char *commit_hash)
 	}
 	demo_file_handle.put(0x0);
 
+	demo_time_override_enabled = true;
+	demo_time_override = 0;
+
 	write_world_size();
 
 	turf_update_buffer.flush();
 	obj_update_buffer.flush();
 	mob_update_buffer.flush();
+
+	demo_time_override_enabled = false;
 
 	return true;
 }

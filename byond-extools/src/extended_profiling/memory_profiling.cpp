@@ -90,10 +90,10 @@ MobMemUsage get_mob_mem_usage(Value mob)
 	result.unknown_linked_list_1 = calc_linked_list<UnknownComplexLinkedListEntry>(entry->unknown_list1);
 	result.unknown_linked_list_2 = calc_linked_list<UnknownSimpleLinkedListEntry>(entry->unknown_list2);
 	result.unknown_linked_list_3 = calc_linked_list<UnknownSimpleLinkedListEntry>(entry->unknown_list3);
-	if(entry->some_holder1)
-		result.unknown_table_1 = entry->some_holder1->capacity * sizeof(Value);
-	if(entry->some_holder2)
-		result.unknown_table_2 = entry->some_holder2->capacity * sizeof(Value);
+	if(entry->vis_contents)
+		result.unknown_table_1 = entry->vis_contents->capacity * sizeof(Value);
+	if(entry->vis_locs)
+		result.unknown_table_2 = entry->vis_locs->capacity * sizeof(Value);
 
 	return result;
 }

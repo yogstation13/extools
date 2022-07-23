@@ -7,6 +7,9 @@
 
 extern std::ofstream demo_file_handle;
 
+extern bool demo_time_override_enabled;
+extern float demo_time_override;
+
 struct alignas(1) DemoWriterIdFlags {
 	union {
 		struct {
@@ -81,6 +84,7 @@ int write_appearance(std::vector<unsigned char> &buf, int appearance_id);
 void update_demo_time();
 void write_world_size();
 void write_byond_string(std::vector<unsigned char>& buf, int string_id);
+void write_byond_resourceid(std::vector<unsigned char>& buf, int resource_id);
 void write_vlq(std::vector<unsigned char>& buf, int value);
 void write_vlq(int value);
 

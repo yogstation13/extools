@@ -50,11 +50,16 @@ DestroyDatumPtr DestroyDatum;
 SetTurfAppearancePtr SetTurfAppearance;
 SetAppearancePtr SetAppearance;
 SpliceAppearancePtr SpliceAppearance;
+SpliceStringPtr SpliceString;
 SetPixelXPtr SetPixelX;
 SetPixelYPtr SetPixelY;
 SetPixelWPtr SetPixelW;
 SetPixelZPtr SetPixelZ;
 SetMovableDirPtr SetMovableDir;
-SetLocPtr SetLoc/* = (SetLocPtr)0x7864f8c0*/; // 1012f8c0
+SetLocPtr SetLoc;
 GetMobAppearancePtr GetMobAppearance;
 GetObjAppearancePtr GetObjAppearance;
+FlickPtr Flick;
+AnimatePtr Animate;
+InitClientPtr InitClient;
+DeleteClientPtr DeleteClient;

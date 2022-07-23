@@ -174,9 +174,9 @@ struct AssociativeListEntry
 {
 	Value key;
 	Value value;
-	RbtColor color;
 	AssociativeListEntry* left;
 	AssociativeListEntry* right;
+	RbtColor color;
 };
 
 struct RawList
@@ -578,8 +578,8 @@ struct Mob
 	short pixel_z;
 	char unknown3[0x2];
 	UnknownSimpleLinkedListEntry* unknown_list2;
-	TableHolder3* some_holder1;
-	TableHolder3* some_holder2;
+	TableHolder3* vis_contents;
+	TableHolder3* vis_locs;
 	char unknown4[0x8];
 	int appearance;
 	int appearance2;

@@ -101,6 +101,7 @@ typedef void(*DestroyDatumPtr)(int unk1, int unk2, trvh datum);
 typedef void(*SetTurfAppearancePtr)(int appearance, int turf);
 typedef void(*SetAppearancePtr)(trvh atom, int appearance);
 typedef void(__fastcall *SpliceAppearancePtr)(void* this_, int edx, Appearance *appearance);
+typedef void(*SpliceStringPtr)(unsigned int id);
 typedef void(*SetPixelXPtr)(trvh atom, short pixel_x);
 typedef SetPixelXPtr SetPixelYPtr;
 typedef SetPixelXPtr SetPixelZPtr;
@@ -109,6 +110,10 @@ typedef void(*SetMovableDirPtr)(trvh atom, unsigned char dir);
 typedef void(*SetLocPtr)(trvh atom, trvh loc);
 typedef int(*GetObjAppearancePtr)(unsigned int id);
 typedef int(*GetMobAppearancePtr)(unsigned int id);
+typedef bool(*FlickPtr)(trvh icon, trvh atom);
+typedef void(*AnimatePtr)(trvh args);
+typedef void(*InitClientPtr)(void* client, unsigned short client_id);
+typedef void(*DeleteClientPtr)(unsigned short client_id);
 
 extern CrashProcPtr CrashProc;
 extern StartTimingPtr StartTiming;
@@ -161,6 +166,7 @@ extern DestroyDatumPtr DestroyDatum;
 extern SetTurfAppearancePtr SetTurfAppearance;
 extern SetAppearancePtr SetAppearance;
 extern SpliceAppearancePtr SpliceAppearance;
+extern SpliceStringPtr SpliceString;
 extern SetPixelXPtr SetPixelX;
 extern SetPixelYPtr SetPixelY;
 extern SetPixelWPtr SetPixelW;
@@ -169,6 +175,10 @@ extern SetMovableDirPtr SetMovableDir;
 extern SetLocPtr SetLoc;
 extern GetMobAppearancePtr GetMobAppearance;
 extern GetObjAppearancePtr GetObjAppearance;
+extern FlickPtr Flick;
+extern AnimatePtr Animate;
+extern InitClientPtr InitClient;
+extern DeleteClientPtr DeleteClient;
 
 inline void SetAssocElement(unsigned int listType, unsigned int listId, unsigned int keyType, unsigned int keyValue, unsigned int valueType, unsigned int valueValue) {
 	if(SetAssocElement2)
