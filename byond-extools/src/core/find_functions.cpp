@@ -190,13 +190,13 @@ bool Core::find_functions()
 	datum_pointer_table = *(RawDatum****)((char*)DelDatum + 20);
 
 	if ( ByondBuild > 1589 )
-		{
-			current_execution_context_ptr = *(ExecutionContext * **)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 85 C0 0F 84 ?? ?? ?? ?? 8B 00 85 C0 0F 84 ?? ?? ?? ?? 8B 00", 1);
-		}
+	{
+		current_execution_context_ptr = *(ExecutionContext * **)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 85 C0 0F 84 ?? ?? ?? ?? 8B 00 85 C0 0F 84 ?? ?? ?? ?? 8B 00", 1);
+	}
 	else
-		{
-			current_execution_context_ptr = *(ExecutionContext * **)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 8D 7D ?? 89 78 ??", 1);
-		}
+	{
+		current_execution_context_ptr = *(ExecutionContext * **)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 8D 7D ?? 89 78 ??", 1);
+	}
 	misc_entry_table = **(MiscEntry * ***)Pocket::Sigscan::FindPattern(BYONDCORE, "A1 ?? ?? ?? ?? 8B 04 98 85 C0 74 ?? 89 04 24 E8 ?? ?? ?? ?? 8B 15 ?? ?? ?? ??", 1);
 #endif
 	return !failed;
