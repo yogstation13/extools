@@ -49,7 +49,7 @@ bool Core::find_functions()
 		FIND_OR_DIE(GetAssocElement, "55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 83 EC 10 53 56 57 A1 ?? ?? ?? ?? 33 C5 50 8D 45 F4 64 A3 00 00 00 00 8B 4D");
 		FIND_OR_DIE(SetAssocElement1, "55 8B EC 6A FF 68 ?? ?? ?? ?? 64 A1 00 00 00 00 50 83 EC 14 56 57 A1 ?? ?? ?? ?? 33 C5 50 8D 45 F4 64 A3 00 00 00 00 8B 4D");
 		FIND_OR_DIE(IsInContainer, "55 8B EC 8B 4D 10 83 EC 38 0F B6 C1 56 57 83 F8");
-		FIND_OR_DIE(DestroyDatum, "55 8B EC B9 D4 40 3A 10 E8 ?? ?? ?? ?? 84 C0 74 09 80 3D BC ?? ?? ?? ?? 74 1B FF 75 14 B9 D4 40");
+		FIND_OR_DIE(DestroyDatum, "55 8B EC B9 ?? ?? ?? ?? E8 ?? ?? ?? ?? 84 C0 74 09 80 3D BC ?? ?? ?? ?? 74 1B FF 75 14 B9 D4 40");
 		//FIND_OR_DIE(SendMaps, "55 8B EC 6A FF 68 C7 B0 31 10 64 A1 00 00 00 00 50 81 EC 58 07 00 00 A1 90 B3 38 10 33 C5 89 45 F0 53 56 57 50 8D 45 F4 64 A3 00 00 00 00 A0 98");
 	}
 	else
