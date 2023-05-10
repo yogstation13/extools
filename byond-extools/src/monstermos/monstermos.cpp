@@ -503,9 +503,7 @@ const char* enable_monstermos()
 	//Set up gas types map
 	std::vector<Value> nullvector = { Value(0.0f) };
 	Container gas_types_list = Core::get_proc("/proc/gas_types").call(nullvector);
-	Value GLOB = Value::Global().get("GLOB");
-	if (!GLOB) return "GLOB is null!";
-	Container meta_gas_info = GLOB.get("meta_gas_info");
+	Container meta_gas_info = Value::Global().get("meta_gas_info");
 	int gaslen = gas_types_list.length();
 	if (gaslen != TOTAL_NUM_GASES) {
 		return "TOTAL_NUM_GASES does not match the number of /datum/gas subtypes!!";
