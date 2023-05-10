@@ -442,9 +442,7 @@ trvh refresh_atmos_grid(unsigned int args_len, Value* args, Value src)
 }
 
 void initialize_gas_overlays() {
-	Value GLOB = Value::Global().get("GLOB");
-	if (!GLOB) return;
-	Container meta_gas_info = GLOB.get("meta_gas_info");
+	Container meta_gas_info = Value::Global().get("meta_gas_info");
 	if (!meta_gas_info.type) return;
 	for (int i = 0; i < TOTAL_NUM_GASES; ++i)
 	{
