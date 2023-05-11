@@ -497,7 +497,7 @@ const char* enable_monstermos()
 	str_id_floor_rip = Core::GetStringId("handle decompression floor rip", true);
 	str_id_extools_pointer = Core::GetStringId("_extools_pointer_gasmixture", true);
 
-	SSair = Value::Global().get("SSair");
+	SSair = Value(GetAssocElement(0x52, 0, STRING, Core::GetStringId("SSair")));
 	//Set up gas types map
 	std::vector<Value> nullvector = { Value(0.0f) };
 	Container gas_types_list = Core::get_proc("/proc/gas_types").call(nullvector);
