@@ -125,7 +125,7 @@ bool Core::find_functions()
 		FIND_OR_DIE(CallProcByName, "55 89 E5 57 56 89 CE 53 89 D3 83 EC 6C 0F B6 55 08 89 45 B4 8B 45 14 8B 7D 10 C6 45 E7 00 0F B6 ??");
 		FIND_OR_DIE(DecRefCount, "55 89 E5 83 EC 38 8B 55 08 89 5D F8 8B 5D 0C 89 75 FC 80 FA 54 89 D0 76 6F 88 C2 89 5C 24 04 8D ??");
 		FIND_OR_DIE(IncRefCount, "55 89 E5 53 83 EC 34 8B 4D 08 8B 45 0C 80 F9 54 89 CA 76 64 88 D1 8D 5D F4 89 44 24 04 C7 44 24 ??");
-		FIND_OR_DIE(GetAssocElement, "55 89 E5 83 EC ?? ?? ?? ?? 5D F4 89 D3 89 75 F8 89 D6 89 7D FC 89 CF 89 45 B4 0F 84 B7 00 00 ??"); // regparm3
+		FIND_OR_DIE(GetAssocElement, "55 89 E5 83 EC ?? ?? ?? ?? ?? 5D F4 89 D3 89 75 F8 89 D6 89 7D FC 89 CF 89 45 B4 0F 84 B7 00 00 ??"); // regparm3
 		FIND_OR_DIE(SetVariable, "55 89 E5 81 EC ?? ?? ?? ?? 89 5D F4 8B 5D 08 8B 45 0C 89 75 F8 8B 55 18 89 7D FC 8B 75 10 80 FB ??");
 		FIND_OR_DIE(CallGlobalProc, "55 89 E5 81 EC ?? ?? ?? ?? 89 5D F4 0F B6 ??");
 	}
