@@ -119,7 +119,7 @@ bool Core::find_functions()
 	{
 		FIND_OR_DIE(ProcCleanup, "55 89 E5 57 56 53 89 C3 83 EC 5C 8B 40 ??");
 		FIND_OR_DIE(Runtime, "55 89 E5 57 56 53 83 EC ?? 8B ?? ?? ?? ?? ?? 85 D2 0F ?? ?? ?? ?? ?? 0F ?? ?? ?? ?? ?? 0F ?? ?? ??");
-		FIND_OR_DIE(ToString, "55 89 E5 83 EC 68 89 5D F4 8D 5D C8 89 75 F8 89 ??");
+		FIND_OR_DIE(ToString, "55 89 E5 83 ?? ?? 89 5D F4 8D ?? ?? 89 75 F8 89 7D FC 80 ?? ?? ?? ?? ?? B8");
 		FIND_OR_DIE(GetTurf, "55 89 E5 83 EC 38 0F ?? ?? ?? ?? ?? ?? 0F B7 ??");
 		FIND_OR_DIE(SetAssocElement2, "55 89 E5 83 EC 68 89 75 F8 8B 75 08 89 5D F4 89 C3 8B 45 0C 89 7D FC 80 FB 3C 89 D7 88 5D BF 89 ??");
 		FIND_OR_DIE(CallProcByName, "55 89 E5 57 56 89 CE 53 89 D3 83 EC 6C 0F B6 55 08 89 45 B4 8B 45 14 8B 7D 10 C6 45 E7 00 0F B6 ??");
