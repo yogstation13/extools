@@ -26,7 +26,7 @@ int gas_mixture_count = 0;
 float gas_moles_visible[TOTAL_NUM_GASES];
 std::vector<Value> gas_overlays[TOTAL_NUM_GASES];
 
-std::shared_ptr<GasMixture> &get_gas_mixture(Value val)
+std::shared_ptr<GasMixture>& get_gas_mixture(Value val)
 {
 	uint32_t v = val.get_by_id(str_id_extools_pointer).value;
 	if (v == 0) Runtime("Gas mixture has null extools pointer");
@@ -37,7 +37,7 @@ int str_id_volume;
 trvh gasmixture_register(unsigned int args_len, Value* args, Value src)
 {
 	//gas_mixtures[src.value] = std::make_shared<GasMixture>(src.get_by_id(str_id_volume).valuef);
-	std::shared_ptr<GasMixture> *ptr = new std::shared_ptr<GasMixture>;
+	std::shared_ptr<GasMixture>* ptr = new std::shared_ptr<GasMixture>;
 	*ptr = std::make_shared<GasMixture>(src.get_by_id(str_id_volume).valuef);
 	SetVariable(src.type, src.value, str_id_extools_pointer, Value(NUMBER, (int)ptr));
 	gas_mixture_count++;
@@ -48,7 +48,7 @@ trvh gasmixture_unregister(unsigned int args_len, Value* args, Value src)
 {
 	uint32_t v = src.get_by_id(str_id_extools_pointer).value;
 	if (v != 0) {
-		std::shared_ptr<GasMixture> *gm = (std::shared_ptr<GasMixture> *)v;
+		std::shared_ptr<GasMixture>* gm = (std::shared_ptr<GasMixture> *)v;
 		delete gm;
 		gas_mixture_count--;
 		SetVariable(src.type, src.value, str_id_extools_pointer, Value::Null());
@@ -58,9 +58,9 @@ trvh gasmixture_unregister(unsigned int args_len, Value* args, Value src)
 
 DelDatumPtr oDelDatum;
 void hDelDatum(unsigned int datum_id) {
-	RawDatum *datum = Core::GetDatumPointerById(datum_id);
+	RawDatum* datum = Core::GetDatumPointerById(datum_id);
 	if (datum != nullptr) {
-		std::shared_ptr<GasMixture> *gm = nullptr;
+		std::shared_ptr<GasMixture>* gm = nullptr;
 		if (datum->len_vars < 10) { // if it has a whole bunch of vars it's probably not a gas mixture. Please don't add a whole bunch of vars to gas mixtures.
 			for (int i = 0; i < datum->len_vars; i++) {
 				if (datum->vars[i].id == str_id_extools_pointer) {
@@ -168,7 +168,7 @@ trvh gasmixture_get_last_share(unsigned int args_len, Value* args, Value src)
 trvh gasmixture_get_gases(unsigned int args_len, Value* args, Value src)
 {
 	List l(CreateList(0));
-	GasMixture &gm = *get_gas_mixture(src);
+	GasMixture& gm = *get_gas_mixture(src);
 	for (int i = 0; i < TOTAL_NUM_GASES; i++) {
 		if (gm.get_moles(i) >= GAS_MIN_MOLES) {
 			l.append(gas_id_to_type[i]);
@@ -183,10 +183,12 @@ trvh gasmixture_set_temperature(unsigned int args_len, Value* args, Value src)
 	if (std::isnan(vf) || std::isinf(vf)) {
 		get_gas_mixture(src)->set_temperature(0);
 		Runtime("Attempt to set temperature to NaN or Infinity");
-	} else if(vf < 0) {
+	}
+	else if (vf < 0) {
 		get_gas_mixture(src)->set_temperature(0);
 		Runtime("Attempt to set temperature to negative number");
-	} else {
+	}
+	else {
 		get_gas_mixture(src)->set_temperature(vf);
 	}
 	return Value::Null();
@@ -215,10 +217,12 @@ trvh gasmixture_set_moles(unsigned int args_len, Value* args, Value src)
 	if (std::isnan(vf) || std::isinf(vf)) {
 		get_gas_mixture(src)->set_moles(index, 0);
 		Runtime("Attempt to set moles to NaN or Infinity");
-	} else if(vf < 0) {
+	}
+	else if (vf < 0) {
 		get_gas_mixture(src)->set_moles(index, 0);
 		Runtime("Attempt to set moles to negative number");
-	} else {
+	}
+	else {
 		get_gas_mixture(src)->set_moles(index, vf);
 	}
 	return Value::Null();
@@ -228,8 +232,8 @@ trvh gasmixture_scrub_into(unsigned int args_len, Value* args, Value src)
 {
 	if (args_len < 2)
 		return Value::Null();
-	GasMixture &src_gas = *get_gas_mixture(src);
-	GasMixture &dest_gas = *get_gas_mixture(args[0]);
+	GasMixture& src_gas = *get_gas_mixture(src);
+	GasMixture& dest_gas = *get_gas_mixture(args[0]);
 	Container gases_to_scrub = args[1];
 	int num_gases = gases_to_scrub.length();
 	GasMixture buffer(CELL_VOLUME);
@@ -268,7 +272,8 @@ trvh gasmixture_compare(unsigned int args_len, Value* args, Value src)
 	}
 	else if (result == -2) {
 		return Value("");
-	} else{
+	}
+	else {
 		return gas_id_to_type[result];
 	}
 }
@@ -282,7 +287,7 @@ trvh gasmixture_multiply(unsigned int args_len, Value* args, Value src)
 trvh turf_update_adjacent(unsigned int args_len, Value* args, Value src)
 {
 	if (src.type != TURF) { return Value::Null(); }
-	Tile *tile = all_turfs.get(src.value);
+	Tile* tile = all_turfs.get(src.value);
 	if (tile != nullptr) {
 		tile->update_adjacent(all_turfs);
 	}
@@ -292,7 +297,7 @@ trvh turf_update_adjacent(unsigned int args_len, Value* args, Value src)
 trvh turf_update_air_ref(unsigned int args_len, Value* args, Value src)
 {
 	if (src.type != TURF) { return Value::Null(); }
-	Tile *tile = all_turfs.get(src.value);
+	Tile* tile = all_turfs.get(src.value);
 	if (tile != nullptr) {
 		tile->update_air_ref();
 	}
@@ -302,7 +307,7 @@ trvh turf_update_air_ref(unsigned int args_len, Value* args, Value src)
 trvh turf_eg_reset_cooldowns(unsigned int args_len, Value* args, Value src)
 {
 	if (src.type != TURF) { return Value::Null(); }
-	Tile *tile = all_turfs.get(src.value);
+	Tile* tile = all_turfs.get(src.value);
 	if (tile != nullptr) {
 		if (tile->excited_group) {
 			tile->excited_group->reset_cooldowns();
@@ -314,7 +319,7 @@ trvh turf_eg_reset_cooldowns(unsigned int args_len, Value* args, Value src)
 trvh turf_eg_garbage_collect(unsigned int args_len, Value* args, Value src)
 {
 	if (src.type != TURF) { return Value::Null(); }
-	Tile *tile = all_turfs.get(src.value);
+	Tile* tile = all_turfs.get(src.value);
 	if (tile != nullptr) {
 		if (tile->excited_group) {
 			// store to local variable to prevent it from being destructed while we're still using it because that causes segfaults.
@@ -328,7 +333,7 @@ trvh turf_eg_garbage_collect(unsigned int args_len, Value* args, Value src)
 trvh turf_get_excited(unsigned int args_len, Value* args, Value src)
 {
 	if (src.type != TURF) { return Value::Null(); }
-	Tile *tile = all_turfs.get(src.value);
+	Tile* tile = all_turfs.get(src.value);
 	if (tile != nullptr) {
 		return Value(tile->excited ? 1.0 : 0.0);
 	}
@@ -337,7 +342,7 @@ trvh turf_get_excited(unsigned int args_len, Value* args, Value src)
 trvh turf_set_excited(unsigned int args_len, Value* args, Value src)
 {
 	if (src.type != TURF) { return Value::Null(); }
-	Tile *tile = all_turfs.get(src.value);
+	Tile* tile = all_turfs.get(src.value);
 	if (tile != nullptr) {
 		tile->excited = args_len > 0 ? (bool)args[0] : false;
 	}
@@ -347,7 +352,7 @@ trvh turf_set_excited(unsigned int args_len, Value* args, Value src)
 trvh turf_process_cell(unsigned int args_len, Value* args, Value src)
 {
 	if (src.type != TURF || args_len < 1) { return Value::Null(); }
-	Tile *tile = all_turfs.get(src.value);
+	Tile* tile = all_turfs.get(src.value);
 	if (tile != nullptr) {
 		tile->process_cell(args[0]);
 	}
@@ -356,7 +361,7 @@ trvh turf_process_cell(unsigned int args_len, Value* args, Value src)
 
 trvh turf_eq(unsigned int args_len, Value* args, Value src) {
 	if (src.type != TURF || args_len < 1) { return Value::Null(); }
-	Tile *tile = all_turfs.get(src.value);
+	Tile* tile = all_turfs.get(src.value);
 	if (tile != nullptr) {
 		tile->equalize_pressure_in_zone(args[0]);
 	}
@@ -377,7 +382,7 @@ trvh turf_update_visuals(unsigned int args_len, Value* args, Value src) {
 		if (gm.get_moles(i) > gas_moles_visible[i]) {
 			// you know whats fun?
 			// getting cucked by BYOND arrays starting at 1. How did this not segfault before? Beats me! I love undefined behavior!    Bandaid: VV
-			overlay_types.push_back(gas_overlays[i][std::fmin(FACTOR_GAS_VISIBLE_MAX, (int)std::ceil(gm.get_moles(i) / MOLES_GAS_VISIBLE_STEP))-1]);
+			overlay_types.push_back(gas_overlays[i][std::fmin(FACTOR_GAS_VISIBLE_MAX, (int)std::ceil(gm.get_moles(i) / MOLES_GAS_VISIBLE_STEP)) - 1]);
 		}
 	}
 
@@ -396,12 +401,12 @@ trvh turf_update_visuals(unsigned int args_len, Value* args, Value src) {
 			}
 		}
 	}
-	
+
 	List l(CreateList(0));
 	for (int i = 0; i < overlay_types.size(); i++) {
 		l.append(overlay_types[i]);
 	}
-	src.invoke("set_visuals", { Value(l) } );
+	src.invoke("set_visuals", { Value(l) });
 	return Value::Null();
 }
 
