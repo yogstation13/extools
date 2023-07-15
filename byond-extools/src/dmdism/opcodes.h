@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <cstdint>
 #include "../core/byond_constants.h"
 
 // Opaque declaration and additional constants for the most important values,
