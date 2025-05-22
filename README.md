@@ -1,3 +1,7 @@
+## Yogstation13 is shutting down
+> [!WARNING]
+Yogstation13 will be permanently shutting down on the 30th of April 2025. See https://forums.yogstation.net/shutdown/ for more information.
+
 # BYOND extools
 External tools for BYOND. Used to fiddle with the game engine's internals.
 
